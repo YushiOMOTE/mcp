@@ -1,0 +1,2 @@
+# mcp
+Minimum crappy playable
