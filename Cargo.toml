@@ -1,0 +1,12 @@
+[package]
+name = "mcp"
+version = "0.1.0"
+authors = ["Yushi Omote <yushiomote@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+specs = "0.15"
+specs-derive = "0.4"
+quicksilver = "0.3"
+derive-new = "0.5"
+rand = "0.7"
