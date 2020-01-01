@@ -35,8 +35,8 @@ impl User {
 pub fn user_spawn(world: &mut World) -> Entity {
     world
         .create_entity()
-        .with(Pos::new(WIDTH / 2.0, HEIGHT * 0.9, 0.0, 15.0, 30.0))
-        .with(Player::new(100, 0))
+        .with(Pos::new(WIDTH / 2.0, HEIGHT * 0.9, 0.0, 16.0, 24.0))
+        .with(Player::new(150, 0))
         .with(Vel::new(0.0, 0.0))
         .with(Bound::new(0.0, 0.0, WIDTH, HEIGHT))
         .with(Animation::new(AssetId::new(0), 10).add(AssetId::new(10000), 10))
@@ -67,7 +67,7 @@ pub fn user_shoot(world: &mut World) {
     };
 
     match player.level {
-        0 => {
+        0..=3 => {
             pos.x += 6.0;
             pos.w = 6.0;
             pos.h = 14.0;
@@ -77,10 +77,10 @@ pub fn user_shoot(world: &mut World) {
                 .with(pos)
                 .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                 .with(Vel::new(0.0, -10.0))
-                .with(Bullet::player(10))
+                .with(Bullet::player(8))
                 .build();
         }
-        1..=3 => {
+        4..=5 => {
             for i in 0..3 {
                 let mut pos = pos.clone();
                 pos.x += (i as f32) * 16.0 - 12.0;
@@ -92,11 +92,11 @@ pub fn user_shoot(world: &mut World) {
                     .with(pos)
                     .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                     .with(Vel::new(0.0, -10.0))
-                    .with(Bullet::player(10))
+                    .with(Bullet::player(5))
                     .build();
             }
         }
-        4..=6 => {
+        6..=7 => {
             for i in 0..5 {
                 let mut pos = pos.clone();
                 pos.x += (i as f32) * 12.0 - 18.0;
@@ -108,11 +108,11 @@ pub fn user_shoot(world: &mut World) {
                     .with(pos)
                     .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                     .with(Vel::new(0.0, -10.0))
-                    .with(Bullet::player(10))
+                    .with(Bullet::player(4))
                     .build();
             }
         }
-        7..=9 => {
+        8..=9 => {
             for i in 0..10 {
                 let mut pos = pos.clone();
                 pos.x += 6.0;
@@ -128,7 +128,7 @@ pub fn user_shoot(world: &mut World) {
                     .with(pos)
                     .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                     .with(Vel::new(sx, sy))
-                    .with(Bullet::player(10))
+                    .with(Bullet::player(4))
                     .build();
             }
         }
@@ -148,7 +148,7 @@ pub fn user_shoot(world: &mut World) {
                     .with(pos)
                     .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                     .with(Vel::new(sx, sy))
-                    .with(Bullet::player(10))
+                    .with(Bullet::player(4))
                     .build();
             }
         }

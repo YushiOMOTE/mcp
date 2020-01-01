@@ -1,8 +1,10 @@
-use crate::{components::*, utils::*};
+use crate::{components::*, resources::*, utils::*};
 use specs::prelude::*;
 
-pub fn items_spawn<'a>(world: &mut World, count: u64) {
-    if count % 200 != 0 {
+pub fn spawn<'a>(world: &mut World) {
+    let count = world.fetch::<Context>().count;
+
+    if count % 600 != 0 {
         return;
     }
 

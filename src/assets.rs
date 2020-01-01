@@ -16,11 +16,11 @@ fn load_assets() -> Box<dyn Future<Item = HashMap<AssetId, Image>, Error = quick
         .map(move |img| {
             map.insert(
                 AssetId::new(0),
-                img.subimage(Rectangle::new((0.0, 0.0), (12.0, 24.0))),
+                img.subimage(Rectangle::new((32.0, 0.0), (16.0, 24.0))),
             );
             map.insert(
                 AssetId::new(10000),
-                img.subimage(Rectangle::new((0.0, 24.0), (12.0, 24.0))),
+                img.subimage(Rectangle::new((32.0, 24.0), (16.0, 24.0))),
             );
             map
         })
@@ -42,6 +42,30 @@ fn load_assets() -> Box<dyn Future<Item = HashMap<AssetId, Image>, Error = quick
             map.insert(
                 AssetId::new(10003),
                 img.subimage(Rectangle::new((20.0, 7.0), (5.0, 5.0))),
+            );
+            map
+        })
+        .and_then(|map| Image::load("enemy-small.png").map(move |img| (map, img)))
+        .map(|(mut map, img)| {
+            map.insert(
+                AssetId::new(10),
+                img.subimage(Rectangle::new((0.0, 0.0), (16.0, 16.0))),
+            );
+            map.insert(
+                AssetId::new(10010),
+                img.subimage(Rectangle::new((16.0, 0.0), (16.0, 16.0))),
+            );
+            map
+        })
+        .and_then(|map| Image::load("enemy-medium.png").map(move |img| (map, img)))
+        .map(|(mut map, img)| {
+            map.insert(
+                AssetId::new(11),
+                img.subimage(Rectangle::new((0.0, 0.0), (32.0, 16.0))),
+            );
+            map.insert(
+                AssetId::new(10011),
+                img.subimage(Rectangle::new((32.0, 0.0), (32.0, 16.0))),
             );
             map
         })

@@ -1,137 +1,72 @@
-use crate::{components::*, resources::*, utils::*};
+use crate::{resources::*, utils::*};
 use specs::prelude::*;
-use specs_derive::Component;
 
-#[derive(Debug, Component)]
-pub struct Normal;
+macro_rules! enemy {
+    ($($id:tt),*) => {
+        $(mod $id;)*
 
-fn spawn_normal(world: &mut World) {
-    let y = 0.0;
-    let x = random_x();
-
-    let animation = Animation::new(AssetId::new(2), 10).add(AssetId::new(10002), 10);
-
-    world
-        .create_entity()
-        .with(Pos::new(x, y, 0.0, 26.0, 30.0))
-        .with(Enemy::new(10))
-        .with(animation)
-        .with(Vel::new(0.0, 1.0))
-        .with(Normal)
-        .with(Lifetime::Frameout)
-        .build();
-}
-
-pub struct MoveNormal;
-
-impl<'a> System<'a> for MoveNormal {
-    type SystemData = (
-        Entities<'a>,
-        Read<'a, LazyUpdate>,
-        Read<'a, Context>,
-        ReadStorage<'a, Pos>,
-        ReadStorage<'a, Normal>,
-    );
-
-    fn run(&mut self, (e, lazy, context, pos, normal): Self::SystemData) {
-        if context.count % 200 != 0 {
-            return;
+        pub fn init(world: &mut World) {
+            $(world.register::<$id::Label>();)*
         }
 
-        for (pos, _) in (&pos, &normal).join() {
-            for v in &[Vel::new(0.0, 2.0), Vel::new(1.4, 1.4), Vel::new(-1.4, 1.4)] {
-                let animation = Animation::new(AssetId::new(3), 10).add(AssetId::new(10003), 10);
+        pub fn update(world: &mut World) {
+            $($id::Action.run_now(world);)*
+        }
 
-                let mut pos = pos.clone();
-                pos.x += 10.0;
-                pos.w = 10.0;
-                pos.h = 10.0;
-                lazy.create_entity(&e)
-                    .with(pos)
-                    .with(Bullet::enemy(10))
-                    .with(animation)
-                    .with(Lifetime::Frameout)
-                    .with(v.clone())
-                    .build();
+        pub fn spawn_one(world: &mut World, id: &str, x: f32, y: f32) {
+            match id {
+                $(stringify!($id) => $id::spawn(world, x, y),)*
+                _ => panic!("No such enemy id: {}", id),
             }
         }
-    }
+    };
 }
 
-#[derive(Debug, Component)]
-pub struct Boss;
-
-fn spawn_boss(world: &mut World) {
-    let y = -200.0;
-    let x = WIDTH / 2.0 - 100.0;
-
-    let animation = Animation::new(AssetId::new(5), 1);
-
-    world
-        .create_entity()
-        .with(Pos::new(x, y, 0.0, 200.0, 200.0))
-        .with(Enemy::new(500))
-        .with(animation)
-        .with(Lifetime::Frameout)
-        .with(Vel::new(0.0, 0.3))
-        .with(Boss)
-        .build();
+enemy! {
+    boss1,
+    normal1,
+    normal2,
+    normal3
 }
 
-pub struct MoveBoss;
+pub fn spawn(world: &mut World) {
+    let count = world.fetch::<Context>().count;
 
-impl<'a> System<'a> for MoveBoss {
-    type SystemData = (
-        Entities<'a>,
-        Read<'a, LazyUpdate>,
-        Read<'a, Context>,
-        ReadStorage<'a, Pos>,
-        ReadStorage<'a, Boss>,
-    );
-
-    fn run(&mut self, (e, lazy, context, pos, boss): Self::SystemData) {
-        if context.count % 40 != 0 {
-            return;
-        }
-
-        for (pos, _) in (&pos, &boss).join() {
-            for i in 0..32 {
-                let animation = Animation::new(AssetId::new(3), 10).add(AssetId::new(10003), 10);
-
-                let r = (3.14 * 2.0 / 32.0) * (i as f32);
-                let vx = r.sin() * 2.0;
-                let vy = r.cos() * 2.0;
-                let mut pos = pos.clone();
-                pos.x += pos.w / 2.0 + (((context.count / 40) % 8) as f32 * 20.0) - 80.0;
-                pos.y += pos.h / 2.0;
-                pos.w = 10.0;
-                pos.h = 10.0;
-                lazy.create_entity(&e)
-                    .with(pos)
-                    .with(Bullet::enemy(10))
-                    .with(animation)
-                    .with(Vel::new(vx, vy))
-                    .with(Lifetime::Frameout)
-                    .build();
-            }
-        }
-    }
-}
-
-pub fn enemies_spawn(world: &mut World, count: u64) {
-    let num = if count < 1000 {
-        40
-    } else if count < 1500 {
-        100
-    } else {
-        1000
+    let num = match count {
+        0..=1000 => 400,
+        1001..=2000 => 300,
+        2001..=3000 => 200,
+        3001..=4000 => 100,
+        4001..=5000 => 400,
+        5001..=6000 => 100,
+        6001..=7000 => 50,
+        7001..=8000 => 400,
+        8001..=9000 => 20,
+        9001..=10000 => 400,
+        _ => 800,
     };
 
     if count % num == 0 {
-        spawn_normal(world);
+        match (count / 100) % 3 {
+            0 => spawn_one(world, "normal1", random_x(), 0.0),
+            1 => spawn_one(world, "normal2", random_x(), 0.0),
+            2 => spawn_one(world, "normal3", random_x(), 0.0),
+            _ => unreachable!(),
+        }
     }
 
-    if count == 1000 {
-        spawn_boss(world);
+    if count == 4000 {
+        spawn_one(world, "boss1", WIDTH / 2.0 - 100.0, -200.0);
+    }
+
+    if count == 7000 {
+        spawn_one(world, "boss1", WIDTH / 2.0 - 400.0, -200.0);
+        spawn_one(world, "boss1", WIDTH / 2.0 + 300.0, -200.0);
+    }
+
+    if count == 9000 {
+        spawn_one(world, "boss1", WIDTH / 2.0 - 400.0, -200.0);
+        spawn_one(world, "boss1", WIDTH / 2.0 - 100.0, -200.0);
+        spawn_one(world, "boss1", WIDTH / 2.0 + 300.0, -200.0);
     }
 }

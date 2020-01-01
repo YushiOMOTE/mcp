@@ -27,8 +27,8 @@ impl State for Play {
         world.register::<Enemy>();
         world.register::<Bullet>();
         world.register::<Item>();
-        world.register::<enemies::Normal>();
-        world.register::<enemies::Boss>();
+
+        enemies::init(&mut world);
 
         background_spawn(&mut world);
 
@@ -94,8 +94,7 @@ impl State for Play {
         BulletCollisions.run_now(&mut self.world);
         EnemyCollisions.run_now(&mut self.world);
         ItemCollisions.run_now(&mut self.world);
-        enemies::MoveBoss.run_now(&mut self.world);
-        enemies::MoveNormal.run_now(&mut self.world);
+        enemies::update(&mut self.world);
         self.world.maintain();
 
         Ok(())
@@ -105,10 +104,8 @@ impl State for Play {
         self.world.fetch_mut::<Context>().update();
 
         {
-            let count = self.world.fetch::<Context>().count;
-
-            enemies::enemies_spawn(&mut self.world, count);
-            items::items_spawn(&mut self.world, count);
+            enemies::spawn(&mut self.world);
+            items::spawn(&mut self.world);
         }
 
         if !self.assets.as_ref().unwrap().is_ready() {
