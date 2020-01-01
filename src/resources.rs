@@ -1,68 +1,86 @@
-use crate::components::*;
+use crate::{assets::*, components::*};
+use quicksilver::prelude::*;
 use specs::prelude::*;
 
 pub const WIDTH: f32 = 800.0;
 pub const HEIGHT: f32 = 600.0;
 
 #[derive(Default, Clone)]
-pub struct Counter {
+pub struct Context {
     pub count: u64,
 }
 
-impl Counter {
+impl Context {
     pub fn new() -> Self {
         Self { count: 0 }
     }
 
-    pub fn increment(&mut self) {
+    pub fn update(&mut self) {
         self.count += 1;
     }
 }
 
 #[derive(Default, Clone)]
-pub struct Player {
-    pub life: u64,
-    pub pos: Pos,
-    pub asset: AssetId,
+pub struct User {
+    pub entity: Option<Entity>,
 }
 
-impl Player {
-    pub fn new() -> Self {
+impl User {
+    pub fn new(entity: Entity) -> Self {
         Self {
-            life: 100,
-            pos: Pos::new(WIDTH / 2.0, HEIGHT * 0.9, 15.0, 30.0),
-            asset: AssetId::new(0),
+            entity: Some(entity),
         }
     }
+}
 
-    pub fn move_left(&mut self) {
-        self.pos.x = (self.pos.x - 15.0).max(0.0);
-    }
+pub fn user_alive(world: &mut World) -> bool {
+    let entity = world.fetch::<User>().entity.unwrap();
+    world.is_alive(entity)
+}
 
-    pub fn move_right(&mut self) {
-        self.pos.x = (self.pos.x + 15.0).min(WIDTH - self.pos.w);
-    }
+pub fn user_pos(world: &mut World) -> Pos {
+    let user = world.fetch_mut::<User>();
+    let entity = user.entity.unwrap();
+    let mut pos = world.write_storage::<Pos>();
+    pos.get_mut(entity).unwrap().clone()
+}
 
-    pub fn move_up(&mut self) {
-        self.pos.y = (self.pos.y - 15.0).max(0.0);
-    }
+pub fn update_user_pos<F: FnOnce(&mut Pos)>(world: &mut World, f: F) {
+    let user = world.fetch_mut::<User>();
+    let entity = match user.entity {
+        Some(e) => e,
+        None => return,
+    };
 
-    pub fn move_down(&mut self) {
-        self.pos.y = (self.pos.y + 15.0).min(HEIGHT - self.pos.h);
-    }
+    let mut pos = world.write_storage::<Pos>();
+    let mut pos = match pos.get_mut(entity) {
+        Some(p) => p,
+        None => return,
+    };
 
-    pub fn shoot(&self, world: &mut World) {
-        let mut pos = self.pos.clone();
-        pos.x += 6.0;
-        pos.w = 6.0;
-        pos.h = 14.0;
+    f(&mut pos);
+}
 
-        world
-            .create_entity()
-            .with(pos)
-            .with(AssetId::new(1))
-            .with(Vel::new(0.0, -10.0))
-            .with(Bullet::player(10))
-            .build();
-    }
+pub fn user_move_left(world: &mut World) {
+    update_user_pos(world, |pos| {
+        pos.x = (pos.x - 15.0).max(0.0);
+    });
+}
+
+pub fn user_move_right(world: &mut World) {
+    update_user_pos(world, |pos| {
+        pos.x = (pos.x + 15.0).min(WIDTH - pos.w);
+    });
+}
+
+pub fn user_move_up(world: &mut World) {
+    update_user_pos(world, |pos| {
+        pos.y = (pos.y - 15.0).max(0.0);
+    });
+}
+
+pub fn user_move_down(world: &mut World) {
+    update_user_pos(world, |pos| {
+        pos.y = (pos.y + 15.0).min(HEIGHT - pos.h);
+    });
 }

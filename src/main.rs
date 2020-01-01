@@ -1,5 +1,3 @@
-use quicksilver::lifecycle::State;
-
 mod assets;
 mod components;
 mod effect;

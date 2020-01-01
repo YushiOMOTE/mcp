@@ -6,6 +6,7 @@ use specs_derive::Component;
 pub struct Pos {
     pub x: f32,
     pub y: f32,
+    pub z: f32,
     pub w: f32,
     pub h: f32,
 }
@@ -39,20 +40,67 @@ impl Bullet {
 }
 
 #[derive(new, Default, Component, Debug, Clone)]
+pub struct Player {
+    pub life: u64,
+}
+
+#[derive(new, Default, Component, Debug, Clone)]
 pub struct Enemy {
     pub life: u64,
 }
 
-#[derive(new, Default, Component, Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AssetId(pub u64);
-
 #[derive(Default, Component, Debug, Clone)]
-pub struct Bomb {
-    pub counter: u64,
+pub struct Animation {
+    frames: Vec<Frame>,
 }
 
-impl Bomb {
-    pub fn new() -> Self {
-        Self { counter: 0 }
+#[derive(new, Default, Component, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct AssetId(pub u64);
+
+#[derive(new, Default, Debug, Clone)]
+pub struct Frame {
+    pub aid: AssetId,
+    pub time: u64,
+}
+
+impl Animation {
+    pub fn new(aid: AssetId, time: u64) -> Self {
+        Self {
+            frames: vec![Frame::new(aid, time)],
+        }
     }
+
+    pub fn add(mut self, aid: AssetId, time: u64) -> Self {
+        self.frames.push(Frame::new(aid, time));
+        self
+    }
+
+    fn sums(&self) -> Vec<(u64, u64, AssetId)> {
+        self.frames
+            .iter()
+            .scan(0, |state, f| {
+                let min = *state;
+                *state = *state + f.time;
+                let max = *state;
+                Some((min, max, f.aid))
+            })
+            .collect()
+    }
+
+    pub fn get(&self, count: u64) -> AssetId {
+        let sums = self.sums();
+        let count = count % sums.last().map(|(_, max, _)| *max).unwrap_or(1);
+
+        sums.iter()
+            .find(|(min, max, _)| min <= &count && &count < max)
+            .map(|(_, _, aid)| *aid)
+            .expect("Invalid image state")
+    }
+}
+
+#[derive(new, Component, Debug, Clone)]
+pub enum Lifetime {
+    Frameout,
+    Timer(u64),
+    Scroll(f32),
 }

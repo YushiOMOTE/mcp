@@ -5,6 +5,7 @@ authors = ["Yushi Omote <yushiomote@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+futures = "0.1"
 specs = "0.15"
 specs-derive = "0.4"
 quicksilver = "0.3"
