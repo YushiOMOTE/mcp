@@ -5,10 +5,14 @@ use specs::prelude::*;
 pub struct MoveObjects;
 
 impl<'a> System<'a> for MoveObjects {
-    type SystemData = (WriteStorage<'a, Pos>, ReadStorage<'a, Vel>);
+    type SystemData = (
+        WriteStorage<'a, Pos>,
+        ReadStorage<'a, Vel>,
+        ReadStorage<'a, Bound>,
+    );
 
-    fn run(&mut self, (mut pos, vel): Self::SystemData) {
-        for (pos, vel) in (&mut pos, &vel).join() {
+    fn run(&mut self, (mut pos, vel, bound): Self::SystemData) {
+        for (pos, vel, bound) in (&mut pos, &vel, &bound.maybe()).join() {
             pos.x += vel.x;
             pos.y += vel.y;
         }

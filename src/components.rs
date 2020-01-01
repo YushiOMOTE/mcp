@@ -12,6 +12,14 @@ pub struct Pos {
 }
 
 #[derive(new, Default, Component, Debug, Clone)]
+pub struct Bound {
+    pub x: f32,
+    pub y: f32,
+    pub w: f32,
+    pub h: f32,
+}
+
+#[derive(new, Default, Component, Debug, Clone)]
 pub struct Vel {
     pub x: f32,
     pub y: f32,

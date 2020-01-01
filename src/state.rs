@@ -74,6 +74,8 @@ impl State for Play {
             return Ok(());
         }
 
+        user_clear_move(&mut self.world);
+
         match *event {
             Event::Key(Key::Left, ButtonState::Pressed) => {
                 user_move_left(&mut self.world);
