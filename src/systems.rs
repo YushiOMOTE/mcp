@@ -12,9 +12,24 @@ impl<'a> System<'a> for MoveObjects {
     );
 
     fn run(&mut self, (mut pos, vel, bound): Self::SystemData) {
-        for (pos, vel, bound) in (&mut pos, &vel, &bound.maybe()).join() {
+        for (pos, vel, bound) in (&mut pos, &vel, bound.maybe()).join() {
             pos.x += vel.x;
             pos.y += vel.y;
+
+            if let Some(b) = bound {
+                if pos.x < b.x {
+                    pos.x = b.x;
+                }
+                if pos.x + pos.w > b.x + b.w {
+                    pos.x = b.x + b.w - pos.w;
+                }
+                if pos.y < b.y {
+                    pos.y = b.y;
+                }
+                if pos.y + pos.h > b.y + b.h {
+                    pos.y = b.y + b.h - pos.h;
+                }
+            }
         }
     }
 }

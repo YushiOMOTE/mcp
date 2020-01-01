@@ -19,6 +19,7 @@ impl State for Play {
         world.insert(Context::new());
         world.register::<Vel>();
         world.register::<Pos>();
+        world.register::<Bound>();
         world.register::<Lifetime>();
         world.register::<Animation>();
         world.register::<AssetId>();
@@ -47,6 +48,8 @@ impl State for Play {
             .create_entity()
             .with(Pos::new(WIDTH / 2.0, HEIGHT * 0.9, 0.0, 15.0, 30.0))
             .with(Player::new(100))
+            .with(Vel::new(0.0, 0.0))
+            .with(Bound::new(0.0, 0.0, WIDTH, HEIGHT))
             .with(Animation::new(AssetId::new(0), 10).add(AssetId::new(10000), 10))
             .build();
 
@@ -64,19 +67,6 @@ impl State for Play {
         }
 
         match *event {
-            Event::Key(Key::Escape, ButtonState::Pressed) => {
-                window.close();
-            }
-            _ => {}
-        }
-
-        if !user_alive(&mut self.world) {
-            return Ok(());
-        }
-
-        user_clear_move(&mut self.world);
-
-        match *event {
             Event::Key(Key::Left, ButtonState::Pressed) => {
                 user_move_left(&mut self.world);
             }
@@ -89,22 +79,24 @@ impl State for Play {
             Event::Key(Key::Down, ButtonState::Pressed) => {
                 user_move_down(&mut self.world);
             }
-            Event::Key(Key::Z, ButtonState::Pressed) => {
-                let mut pos = user_pos(&mut self.world);
-
-                pos.x += 6.0;
-                pos.w = 6.0;
-                pos.h = 14.0;
-
-                self.world
-                    .create_entity()
-                    .with(pos)
-                    .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
-                    .with(Vel::new(0.0, -10.0))
-                    .with(Bullet::player(10))
-                    .build();
+            Event::Key(Key::Left, ButtonState::Released) => {
+                user_clear_x(&mut self.world);
             }
-
+            Event::Key(Key::Right, ButtonState::Released) => {
+                user_clear_x(&mut self.world);
+            }
+            Event::Key(Key::Up, ButtonState::Released) => {
+                user_clear_y(&mut self.world);
+            }
+            Event::Key(Key::Down, ButtonState::Released) => {
+                user_clear_y(&mut self.world);
+            }
+            Event::Key(Key::Z, ButtonState::Pressed) => {
+                user_shoot(&mut self.world);
+            }
+            Event::Key(Key::Escape, ButtonState::Pressed) => {
+                window.close();
+            }
             _ => (),
         }
         Ok(())

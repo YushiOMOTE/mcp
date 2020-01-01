@@ -33,54 +33,92 @@ impl User {
     }
 }
 
+pub fn user_clear_y(world: &mut World) {
+    update_user_vel(world, |mut vel| {
+        vel.y = 0.0;
+    });
+}
+
+pub fn user_clear_x(world: &mut World) {
+    update_user_vel(world, |mut vel| {
+        vel.x = 0.0;
+    });
+}
+
+pub fn user_shoot(world: &mut World) {
+    let mut pos = match user_pos(world) {
+        Some(p) => p,
+        None => return,
+    };
+
+    pos.x += 6.0;
+    pos.w = 6.0;
+    pos.h = 14.0;
+
+    world
+        .create_entity()
+        .with(pos)
+        .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+        .with(Vel::new(0.0, -10.0))
+        .with(Bullet::player(10))
+        .build();
+}
+
 pub fn user_alive(world: &mut World) -> bool {
     let entity = world.fetch::<User>().entity.unwrap();
     world.is_alive(entity)
 }
 
-pub fn user_pos(world: &mut World) -> Pos {
+pub fn user_pos(world: &mut World) -> Option<Pos> {
     let user = world.fetch_mut::<User>();
-    let entity = user.entity.unwrap();
+    let entity = user.entity?;
     let mut pos = world.write_storage::<Pos>();
-    pos.get_mut(entity).unwrap().clone()
+    pos.get_mut(entity).cloned()
 }
 
-pub fn update_user_pos<F: FnOnce(&mut Pos)>(world: &mut World, f: F) {
+pub fn user_vel(world: &mut World) -> Option<Vel> {
+    let user = world.fetch_mut::<User>();
+    let entity = user.entity?;
+    let mut vel = world.write_storage::<Vel>();
+    vel.get_mut(entity).cloned()
+}
+
+pub fn update_user_vel<F: FnOnce(&mut Vel)>(world: &mut World, f: F) {
     let user = world.fetch_mut::<User>();
     let entity = match user.entity {
         Some(e) => e,
         None => return,
     };
 
-    let mut pos = world.write_storage::<Pos>();
-    let mut pos = match pos.get_mut(entity) {
+    let mut vel = world.write_storage::<Vel>();
+    let mut vel = match vel.get_mut(entity) {
         Some(p) => p,
         None => return,
     };
 
-    f(&mut pos);
+    f(&mut vel);
 }
 
 pub fn user_move_left(world: &mut World) {
-    update_user_pos(world, |pos| {
-        pos.x = (pos.x - 15.0).max(0.0);
+    update_user_vel(world, |vel| {
+        vel.x = -3.0;
     });
 }
 
 pub fn user_move_right(world: &mut World) {
-    update_user_pos(world, |pos| {
-        pos.x = (pos.x + 15.0).min(WIDTH - pos.w);
+    update_user_vel(world, |vel| {
+        vel.x = 3.0;
     });
 }
 
 pub fn user_move_up(world: &mut World) {
-    update_user_pos(world, |pos| {
-        pos.y = (pos.y - 15.0).max(0.0);
+    update_user_vel(world, |vel| {
+        vel.y = -3.0;
     });
 }
 
 pub fn user_move_down(world: &mut World) {
-    update_user_pos(world, |pos| {
-        pos.y = (pos.y + 15.0).min(HEIGHT - pos.h);
+    update_user_vel(world, |vel| {
+        vel.y = 3.0;
     });
 }
