@@ -33,6 +33,17 @@ impl User {
     }
 }
 
+pub fn user_spawn(world: &mut World) -> Entity {
+    world
+        .create_entity()
+        .with(Pos::new(WIDTH / 2.0, HEIGHT * 0.9, 0.0, 15.0, 30.0))
+        .with(Player::new(100, 0))
+        .with(Vel::new(0.0, 0.0))
+        .with(Bound::new(0.0, 0.0, WIDTH, HEIGHT))
+        .with(Animation::new(AssetId::new(0), 10).add(AssetId::new(10000), 10))
+        .build()
+}
+
 pub fn user_clear_y(world: &mut World) {
     update_user_vel(world, |mut vel| {
         vel.y = 0.0;
@@ -51,17 +62,42 @@ pub fn user_shoot(world: &mut World) {
         None => return,
     };
 
-    pos.x += 6.0;
-    pos.w = 6.0;
-    pos.h = 14.0;
+    let mut player = match user_player(world) {
+        Some(p) => p,
+        None => return,
+    };
 
-    world
-        .create_entity()
-        .with(pos)
-        .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
-        .with(Vel::new(0.0, -10.0))
-        .with(Bullet::player(10))
-        .build();
+    match player.level {
+        0 => {
+            pos.x += 6.0;
+            pos.w = 6.0;
+            pos.h = 14.0;
+
+            world
+                .create_entity()
+                .with(pos)
+                .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+                .with(Vel::new(0.0, -10.0))
+                .with(Bullet::player(10))
+                .build();
+        }
+        _ => {
+            for i in 0..3 {
+                let mut pos = pos.clone();
+                pos.x += (i as f32) * 8.0 - 6.0;
+                pos.w = 6.0;
+                pos.h = 14.0;
+
+                world
+                    .create_entity()
+                    .with(pos)
+                    .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+                    .with(Vel::new(0.0, -10.0))
+                    .with(Bullet::player(10))
+                    .build();
+            }
+        }
+    }
 }
 
 pub fn user_alive(world: &mut World) -> bool {
@@ -74,6 +110,13 @@ pub fn user_pos(world: &mut World) -> Option<Pos> {
     let entity = user.entity?;
     let mut pos = world.write_storage::<Pos>();
     pos.get_mut(entity).cloned()
+}
+
+pub fn user_player(world: &mut World) -> Option<Player> {
+    let user = world.fetch_mut::<User>();
+    let entity = user.entity?;
+    let player = world.read_storage::<Player>();
+    player.get(entity).cloned()
 }
 
 pub fn user_vel(world: &mut World) -> Option<Vel> {

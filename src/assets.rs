@@ -88,6 +88,18 @@ fn load_assets() -> Box<dyn Future<Item = HashMap<AssetId, Image>, Error = quick
             map.insert(AssetId::new(7), img.clone());
             map.insert(AssetId::new(10007), img);
             map
+        })
+        .and_then(|map| Image::load("power-up.png").map(move |img| (map, img)))
+        .map(|(mut map, img)| {
+            map.insert(
+                AssetId::new(9),
+                img.subimage(Rectangle::new((0.0, 0.0), (16.0, 16.0))),
+            );
+            map.insert(
+                AssetId::new(10009),
+                img.subimage(Rectangle::new((16.0, 0.0), (16.0, 16.0))),
+            );
+            map
         });
 
     Box::new(fut)

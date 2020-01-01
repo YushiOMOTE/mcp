@@ -2,7 +2,7 @@ use crate::components::*;
 use specs::prelude::*;
 use specs::world::LazyBuilder;
 
-pub fn create_bomb<'a>(e: LazyBuilder<'a>, pos: &Pos) {
+pub fn bomb_spawn<'a>(e: LazyBuilder<'a>, pos: &Pos) {
     let animation = Animation::new(AssetId::new(6), 5)
         .add(AssetId::new(10006), 5)
         .add(AssetId::new(20006), 5)

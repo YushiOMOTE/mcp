@@ -1,4 +1,4 @@
-use crate::{assets::*, components::*, enemies, resources::*, systems::*};
+use crate::{assets::*, background::*, components::*, enemies, items, resources::*, systems::*};
 use quicksilver::{
     graphics::Color,
     input::{ButtonState, Key},
@@ -26,32 +26,13 @@ impl State for Play {
         world.register::<Player>();
         world.register::<Enemy>();
         world.register::<Bullet>();
+        world.register::<Item>();
         world.register::<enemies::Normal>();
         world.register::<enemies::Boss>();
 
-        world
-            .create_entity()
-            .with(Pos::new(0.0, -HEIGHT * 2.0, -1.0, WIDTH, HEIGHT * 2.0))
-            .with(Vel::new(0.0, 0.4))
-            .with(Animation::new(AssetId::new(7), 1))
-            .with(Lifetime::Scroll(HEIGHT * 2.0))
-            .build();
-        world
-            .create_entity()
-            .with(Pos::new(0.0, 0.0, -1.0, WIDTH, HEIGHT * 2.0))
-            .with(Vel::new(0.0, 0.4))
-            .with(Animation::new(AssetId::new(7), 1))
-            .with(Lifetime::Scroll(HEIGHT * 2.0))
-            .build();
+        background_spawn(&mut world);
 
-        let e = world
-            .create_entity()
-            .with(Pos::new(WIDTH / 2.0, HEIGHT * 0.9, 0.0, 15.0, 30.0))
-            .with(Player::new(100))
-            .with(Vel::new(0.0, 0.0))
-            .with(Bound::new(0.0, 0.0, WIDTH, HEIGHT))
-            .with(Animation::new(AssetId::new(0), 10).add(AssetId::new(10000), 10))
-            .build();
+        let e = user_spawn(&mut world);
 
         world.insert(User::new(e));
 
@@ -112,6 +93,7 @@ impl State for Play {
         MaintainLifetime.run_now(&mut self.world);
         BulletCollisions.run_now(&mut self.world);
         EnemyCollisions.run_now(&mut self.world);
+        ItemCollisions.run_now(&mut self.world);
         enemies::MoveBoss.run_now(&mut self.world);
         enemies::MoveNormal.run_now(&mut self.world);
         self.world.maintain();
@@ -125,21 +107,8 @@ impl State for Play {
         {
             let count = self.world.fetch::<Context>().count;
 
-            let num = if count < 1000 {
-                40
-            } else if count < 1500 {
-                100
-            } else {
-                1000
-            };
-
-            if count % num == 0 {
-                enemies::spawn_normal(&mut self.world);
-            }
-
-            if count == 1000 {
-                enemies::spawn_boss(&mut self.world);
-            }
+            enemies::enemies_spawn(&mut self.world, count);
+            items::items_spawn(&mut self.world, count);
         }
 
         if !self.assets.as_ref().unwrap().is_ready() {

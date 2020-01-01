@@ -1,15 +1,11 @@
-use crate::{components::*, resources::*};
+use crate::{components::*, resources::*, utils::*};
 use specs::prelude::*;
 use specs_derive::Component;
-
-fn random_x() -> f32 {
-    (rand::random::<u64>() % (WIDTH as u64)) as f32
-}
 
 #[derive(Debug, Component)]
 pub struct Normal;
 
-pub fn spawn_normal(world: &mut World) {
+fn spawn_normal(world: &mut World) {
     let y = 0.0;
     let x = random_x();
 
@@ -65,7 +61,7 @@ impl<'a> System<'a> for MoveNormal {
 #[derive(Debug, Component)]
 pub struct Boss;
 
-pub fn spawn_boss(world: &mut World) {
+fn spawn_boss(world: &mut World) {
     let y = 0.0;
     let x = WIDTH / 2.0 - 100.0;
 
@@ -119,5 +115,23 @@ impl<'a> System<'a> for MoveBoss {
                     .build();
             }
         }
+    }
+}
+
+pub fn enemies_spawn(world: &mut World, count: u64) {
+    let num = if count < 1000 {
+        40
+    } else if count < 1500 {
+        100
+    } else {
+        1000
+    };
+
+    if count % num == 0 {
+        spawn_normal(world);
+    }
+
+    if count == 1000 {
+        spawn_boss(world);
     }
 }

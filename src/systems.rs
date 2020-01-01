@@ -17,18 +17,8 @@ impl<'a> System<'a> for MoveObjects {
             pos.y += vel.y;
 
             if let Some(b) = bound {
-                if pos.x < b.x {
-                    pos.x = b.x;
-                }
-                if pos.x + pos.w > b.x + b.w {
-                    pos.x = b.x + b.w - pos.w;
-                }
-                if pos.y < b.y {
-                    pos.y = b.y;
-                }
-                if pos.y + pos.h > b.y + b.h {
-                    pos.y = b.y + b.h - pos.h;
-                }
+                pos.x = pos.x.max(b.x).min(b.x + b.w - pos.w);
+                pos.y = pos.y.max(b.y).min(b.y + b.h - pos.h);
             }
         }
     }
@@ -133,7 +123,7 @@ impl<'a> System<'a> for BulletCollisions {
                             let _ = e.delete(ee);
                         }
 
-                        create_bomb(lazy.create_entity(&e), bpos);
+                        bomb_spawn(lazy.create_entity(&e), bpos);
 
                         let _ = e.delete(be);
                     }
@@ -149,7 +139,7 @@ impl<'a> System<'a> for BulletCollisions {
                             let _ = e.delete(pe);
                         }
 
-                        create_bomb(lazy.create_entity(&e), ppos);
+                        bomb_spawn(lazy.create_entity(&e), ppos);
 
                         let _ = e.delete(be);
                     }
@@ -182,9 +172,32 @@ impl<'a> System<'a> for EnemyCollisions {
                         let _ = e.delete(pe);
                     }
 
-                    create_bomb(lazy.create_entity(&e), epos);
+                    bomb_spawn(lazy.create_entity(&e), epos);
 
                     let _ = e.delete(ee);
+                }
+            }
+        }
+    }
+}
+
+pub struct ItemCollisions;
+
+impl<'a> System<'a> for ItemCollisions {
+    type SystemData = (
+        Entities<'a>,
+        ReadStorage<'a, Pos>,
+        WriteStorage<'a, Player>,
+        ReadStorage<'a, Item>,
+        Read<'a, LazyUpdate>,
+    );
+
+    fn run(&mut self, (e, pos, mut player, item, lazy): Self::SystemData) {
+        for (ie, ipos, item) in (&e, &pos, &item).join() {
+            for (pe, ppos, mut player) in (&e, &pos, &mut player).join() {
+                if hit(ipos, ppos) {
+                    player.level += item.id;
+                    let _ = e.delete(ie);
                 }
             }
         }

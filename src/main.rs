@@ -1,10 +1,13 @@
 mod assets;
+mod background;
 mod components;
 mod effect;
 mod enemies;
+mod items;
 mod resources;
 mod state;
 mod systems;
+mod utils;
 
 use quicksilver::{
     geom::Vector,

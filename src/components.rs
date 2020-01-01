@@ -48,8 +48,14 @@ impl Bullet {
 }
 
 #[derive(new, Default, Component, Debug, Clone)]
+pub struct Item {
+    pub id: u64,
+}
+
+#[derive(new, Default, Component, Debug, Clone)]
 pub struct Player {
     pub life: u64,
+    pub level: u64,
 }
 
 #[derive(new, Default, Component, Debug, Clone)]
