@@ -192,9 +192,9 @@ impl<'a> System<'a> for ItemCollisions {
         Read<'a, LazyUpdate>,
     );
 
-    fn run(&mut self, (e, pos, mut player, item, lazy): Self::SystemData) {
+    fn run(&mut self, (e, pos, mut player, item, _lazy): Self::SystemData) {
         for (ie, ipos, item) in (&e, &pos, &item).join() {
-            for (pe, ppos, mut player) in (&e, &pos, &mut player).join() {
+            for (_pe, ppos, mut player) in (&e, &pos, &mut player).join() {
                 if hit(ipos, ppos) {
                     player.level += item.id;
                     let _ = e.delete(ie);

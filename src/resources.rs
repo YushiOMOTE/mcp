@@ -1,5 +1,4 @@
-use crate::{assets::*, components::*};
-use quicksilver::prelude::*;
+use crate::components::*;
 use specs::prelude::*;
 
 pub const WIDTH: f32 = 800.0;
@@ -62,7 +61,7 @@ pub fn user_shoot(world: &mut World) {
         None => return,
     };
 
-    let mut player = match user_player(world) {
+    let player = match user_player(world) {
         Some(p) => p,
         None => return,
     };
@@ -81,10 +80,10 @@ pub fn user_shoot(world: &mut World) {
                 .with(Bullet::player(10))
                 .build();
         }
-        _ => {
+        1..=3 => {
             for i in 0..3 {
                 let mut pos = pos.clone();
-                pos.x += (i as f32) * 8.0 - 6.0;
+                pos.x += (i as f32) * 16.0 - 12.0;
                 pos.w = 6.0;
                 pos.h = 14.0;
 
@@ -93,6 +92,62 @@ pub fn user_shoot(world: &mut World) {
                     .with(pos)
                     .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                     .with(Vel::new(0.0, -10.0))
+                    .with(Bullet::player(10))
+                    .build();
+            }
+        }
+        4..=6 => {
+            for i in 0..5 {
+                let mut pos = pos.clone();
+                pos.x += (i as f32) * 12.0 - 18.0;
+                pos.w = 6.0;
+                pos.h = 14.0;
+
+                world
+                    .create_entity()
+                    .with(pos)
+                    .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+                    .with(Vel::new(0.0, -10.0))
+                    .with(Bullet::player(10))
+                    .build();
+            }
+        }
+        7..=9 => {
+            for i in 0..10 {
+                let mut pos = pos.clone();
+                pos.x += 6.0;
+                pos.w = 6.0;
+                pos.h = 14.0;
+
+                let s = (3.14 / 2.0 / 9.0) * (i as f32) + 3.14 / 2.0 + 3.14 / 4.0;
+                let sx = s.sin() * 10.0;
+                let sy = s.cos() * 10.0;
+
+                world
+                    .create_entity()
+                    .with(pos)
+                    .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+                    .with(Vel::new(sx, sy))
+                    .with(Bullet::player(10))
+                    .build();
+            }
+        }
+        _ => {
+            for i in 0..25 {
+                let mut pos = pos.clone();
+                pos.x += 6.0;
+                pos.w = 6.0;
+                pos.h = 14.0;
+
+                let s = (3.14 / 24.0) * (i as f32) + 3.14 / 2.0;
+                let sx = s.sin() * 10.0;
+                let sy = s.cos() * 10.0;
+
+                world
+                    .create_entity()
+                    .with(pos)
+                    .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+                    .with(Vel::new(sx, sy))
                     .with(Bullet::player(10))
                     .build();
             }
@@ -119,6 +174,7 @@ pub fn user_player(world: &mut World) -> Option<Player> {
     player.get(entity).cloned()
 }
 
+#[allow(unused)]
 pub fn user_vel(world: &mut World) -> Option<Vel> {
     let user = world.fetch_mut::<User>();
     let entity = user.entity?;

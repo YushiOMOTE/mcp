@@ -62,7 +62,7 @@ impl<'a> System<'a> for MoveNormal {
 pub struct Boss;
 
 fn spawn_boss(world: &mut World) {
-    let y = 0.0;
+    let y = -200.0;
     let x = WIDTH / 2.0 - 100.0;
 
     let animation = Animation::new(AssetId::new(5), 1);
