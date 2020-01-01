@@ -31,16 +31,16 @@ impl State for Play {
 
         world
             .create_entity()
-            .with(Pos::new(0.0, -HEIGHT * 2.0, -10.0, WIDTH, HEIGHT * 2.0))
+            .with(Pos::new(0.0, -HEIGHT * 2.0, -1.0, WIDTH, HEIGHT * 2.0))
             .with(Vel::new(0.0, 0.4))
-            .with(AssetId::new(7))
+            .with(Animation::new(AssetId::new(7), 1))
             .with(Lifetime::Scroll(HEIGHT * 2.0))
             .build();
         world
             .create_entity()
-            .with(Pos::new(0.0, 0.0, -10.0, WIDTH, HEIGHT * 2.0))
+            .with(Pos::new(0.0, 0.0, -1.0, WIDTH, HEIGHT * 2.0))
             .with(Vel::new(0.0, 0.4))
-            .with(AssetId::new(7))
+            .with(Animation::new(AssetId::new(7), 1))
             .with(Lifetime::Scroll(HEIGHT * 2.0))
             .build();
 

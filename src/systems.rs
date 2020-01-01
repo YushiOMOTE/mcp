@@ -69,7 +69,7 @@ impl<'a> System<'a> for MaintainLifetime {
     );
 
     fn run(&mut self, (e, mut pos, mut life): Self::SystemData) {
-        for (ee, mut life) in (&e, &mut life).join() {
+        for (ee, mut pos, mut life) in (&e, (&mut pos).maybe(), &mut life).join() {
             match &mut life {
                 Lifetime::Frameout => {
                     let sw = WIDTH;
@@ -77,7 +77,7 @@ impl<'a> System<'a> for MaintainLifetime {
 
                     let m = 1.0;
 
-                    for (ee, pos) in (&e, &pos).join() {
+                    if let Some(pos) = pos {
                         if (pos.x > sw * (1.0 + m) || pos.x < sw * -1.0 * m)
                             || (pos.y > sh * (1.0 + m) || pos.y < sh * -1.0 * m)
                         {
@@ -93,9 +93,9 @@ impl<'a> System<'a> for MaintainLifetime {
                     }
                 }
                 Lifetime::Scroll(y) => {
-                    for mut pos in (&mut pos).join() {
+                    if let Some(mut pos) = pos.as_mut() {
                         if pos.y >= *y {
-                            pos.y = -*y;
+                            pos.y = -1.0 * (*y);
                         }
                     }
                 }
