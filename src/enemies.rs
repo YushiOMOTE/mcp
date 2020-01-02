@@ -1,32 +1,85 @@
-use crate::{resources::*, utils::*};
+use crate::{components::*, resources::*, utils::*};
+use derive_new::new;
+use serde::{Deserialize, Serialize};
+use serde_yaml::Value;
 use specs::prelude::*;
+use std::collections::HashMap;
 
-macro_rules! enemy {
-    ($($id:tt),*) => {
-        $(mod $id;)*
+mod attack;
+mod motion;
 
-        pub fn init(world: &mut World) {
-            $(world.register::<$id::Label>();)*
-        }
-
-        pub fn update(world: &mut World) {
-            $($id::Action.run_now(world);)*
-        }
-
-        pub fn spawn_one(world: &mut World, id: &str, x: f32, y: f32) {
-            match id {
-                $(stringify!($id) => $id::spawn(world, x, y),)*
-                _ => panic!("No such enemy id: {}", id),
-            }
-        }
-    };
+pub fn init(world: &mut World) {
+    attack::init(world);
+    motion::init(world);
 }
 
-enemy! {
-    boss1,
-    normal1,
-    normal2,
-    normal3
+pub fn update(world: &mut World) {
+    attack::update(world);
+    motion::update(world);
+}
+
+pub fn spawn_one(world: &mut World, name: &str, x: f32, y: f32) {
+    let cfg = {
+        let enemies = &world.fetch::<EnemiesConfig>().enemies;
+        enemies
+            .get(name)
+            .expect(&format!("No such enemy name: {}", name))
+            .clone()
+    };
+
+    let animation = cfg.animation.iter().fold(Animation::empty(), |a, f| {
+        a.add(AssetId::new(f.aid), f.time)
+    });
+
+    let builder = world
+        .create_entity()
+        .with(Pos::new(x, y, 0.0, cfg.size.0, cfg.size.1))
+        .with(Enemy::new(cfg.life))
+        .with(animation)
+        .with(Lifetime::Frameout)
+        .with(Vel::new(0.0, 0.0));
+    let builder = cfg.motion.iter().fold(builder, |b, m| motion::setup(b, m));
+    let builder = cfg.attack.iter().fold(builder, |b, m| attack::setup(b, m));
+
+    builder.build();
+}
+
+#[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
+pub struct EnemiesConfig {
+    enemies: HashMap<String, EnemyConfig>,
+}
+
+#[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
+pub struct EnemyConfig {
+    life: u64,
+    size: (f32, f32),
+    animation: Vec<FrameConfig>,
+    motion: Vec<MotionConfig>,
+    attack: Vec<AttackConfig>,
+}
+
+#[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
+pub struct FrameConfig {
+    aid: u64,
+    time: u64,
+}
+
+#[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
+pub struct AttackConfig {
+    name: String,
+    damage: f64,
+    frequency: u64,
+    size: (f32, f32),
+    animation: Vec<FrameConfig>,
+    #[serde(flatten)]
+    params: Value,
+}
+
+#[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
+pub struct MotionConfig {
+    name: String,
+    #[serde(flatten)]
+    params: Value,
 }
 
 pub fn spawn(world: &mut World) {

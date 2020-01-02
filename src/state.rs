@@ -17,6 +17,7 @@ impl State for Play {
         let mut world = World::new();
 
         world.insert(Context::new());
+        world.insert(enemies::EnemiesConfig::default());
         world.register::<Vel>();
         world.register::<Pos>();
         world.register::<Bound>();
@@ -46,6 +47,8 @@ impl State for Play {
         if !self.assets.as_ref().unwrap().is_ready() {
             return Ok(());
         }
+
+        println!("{:?}", event);
 
         match *event {
             Event::Key(Key::Left, ButtonState::Pressed) => {

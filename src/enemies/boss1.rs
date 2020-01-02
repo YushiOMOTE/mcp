@@ -1,3 +1,4 @@
+use super::*;
 use crate::{components::*, resources::*};
 use specs::prelude::*;
 use specs_derive::Component;
@@ -17,6 +18,18 @@ pub fn spawn(world: &mut World, x: f32, y: f32) {
         .with(Vel::new(0.0, 0.3))
         .with(Label)
         .build();
+}
+
+pub fn init(world: &mut World) {
+    world.register::<Label>();
+}
+
+pub fn setup<B: Builder>(builder: B, cfg: &MotionConfig) -> B {
+    builder.with(Label)
+}
+
+pub fn update(world: &mut World) {
+    Action.run_now(world);
 }
 
 pub struct Action;

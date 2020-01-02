@@ -1,35 +1,11 @@
-use super::*;
-use crate::{components::*, resources::*};
+use crate::{components::*, enemies::*, resources::*};
+use derive_new::new;
 use specs::prelude::*;
 use specs_derive::Component;
 
-#[derive(Debug, Component)]
-pub struct Label;
-
-pub fn spawn(world: &mut World, x: f32, y: f32) {
-    let animation = Animation::new(AssetId::new(2), 10).add(AssetId::new(10002), 10);
-
-    world
-        .create_entity()
-        .with(Pos::new(x, y, 0.0, 26.0, 30.0))
-        .with(Enemy::new(100))
-        .with(animation)
-        .with(Vel::new(0.0, 1.0))
-        .with(Label)
-        .with(Lifetime::Frameout)
-        .build();
-}
-
-pub fn init(world: &mut World) {
-    world.register::<Label>();
-}
-
-pub fn setup<B: Builder>(builder: B, cfg: &MotionConfig) -> B {
-    builder.with(Label)
-}
-
-pub fn update(world: &mut World) {
-    Action.run_now(world);
+#[derive(new, Debug, Component)]
+pub struct Label {
+    cfg: AttackConfig,
 }
 
 pub struct Action;
@@ -43,12 +19,12 @@ impl<'a> System<'a> for Action {
         ReadStorage<'a, Label>,
     );
 
-    fn run(&mut self, (e, lazy, context, pos, normal): Self::SystemData) {
-        if context.count % 200 != 0 {
-            return;
-        }
+    fn run(&mut self, (e, lazy, context, pos, label): Self::SystemData) {
+        for (pos, label) in (&pos, &label).join() {
+            if context.count % label.cfg.frequency != 0 {
+                continue;
+            }
 
-        for (pos, _) in (&pos, &normal).join() {
             for i in 0..=8 {
                 let r = (3.14 / 8.0) * (i as f32) - 3.14 / 2.0;
                 let vx = r.sin() * 2.0;

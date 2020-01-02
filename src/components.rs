@@ -78,6 +78,10 @@ pub struct Frame {
 }
 
 impl Animation {
+    pub fn empty() -> Self {
+        Self { frames: vec![] }
+    }
+
     pub fn new(aid: AssetId, time: u64) -> Self {
         Self {
             frames: vec![Frame::new(aid, time)],

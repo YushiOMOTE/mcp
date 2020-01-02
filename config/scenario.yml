@@ -1,0 +1,7 @@
+- during: [0, 1000]
+  spawn: enemy1
+  freq: 400
+  pos: [random_x, 0.0]
+- at: 4000
+  spawn: enemy1
+  pos: [10.0, 10.0]
