@@ -11,3 +11,5 @@ specs-derive = "0.4"
 quicksilver = "0.3"
 derive-new = "0.5"
 rand = "0.7"
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.8"

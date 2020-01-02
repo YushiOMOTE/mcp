@@ -1,5 +1,4 @@
 use super::*;
-use specs::prelude::*;
 
 macro_rules! attack {
     ($($name:tt),*) => {
@@ -23,5 +22,5 @@ macro_rules! attack {
 }
 
 attack! {
-    sample
+    normal
 }

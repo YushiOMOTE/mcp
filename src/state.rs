@@ -17,7 +17,7 @@ impl State for Play {
         let mut world = World::new();
 
         world.insert(Context::new());
-        world.insert(enemies::EnemiesConfig::default());
+        world.insert(enemies::EnemiesConfig::from_static_file());
         world.register::<Vel>();
         world.register::<Pos>();
         world.register::<Bound>();

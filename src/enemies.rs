@@ -1,12 +1,16 @@
 use crate::{components::*, resources::*, utils::*};
 use derive_new::new;
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use serde_yaml::Value;
 use specs::prelude::*;
 use std::collections::HashMap;
 
 mod attack;
 mod motion;
+
+pub fn parse<T: DeserializeOwned>(value: &Value) -> T {
+    serde_yaml::from_value(value.clone()).expect("Couldn't parse config")
+}
 
 pub fn init(world: &mut World) {
     attack::init(world);
@@ -46,7 +50,15 @@ pub fn spawn_one(world: &mut World, name: &str, x: f32, y: f32) {
 
 #[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct EnemiesConfig {
+    #[serde(flatten)]
     enemies: HashMap<String, EnemyConfig>,
+}
+
+impl EnemiesConfig {
+    pub fn from_static_file() -> Self {
+        serde_yaml::from_str(include_str!("config/enemies.yml"))
+            .expect("Couldn't parse enemies file")
+    }
 }
 
 #[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
@@ -67,7 +79,7 @@ pub struct FrameConfig {
 #[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct AttackConfig {
     name: String,
-    damage: f64,
+    damage: u64,
     frequency: u64,
     size: (f32, f32),
     animation: Vec<FrameConfig>,
@@ -100,16 +112,16 @@ pub fn spawn(world: &mut World) {
     };
 
     if count % num == 0 {
-        match (count / 100) % 3 {
-            0 => spawn_one(world, "normal1", random_x(), 0.0),
-            1 => spawn_one(world, "normal2", random_x(), 0.0),
-            2 => spawn_one(world, "normal3", random_x(), 0.0),
+        match (count / 100) % 5 {
+            0 | 1 => spawn_one(world, "enemy3", random_x(), 0.0),
+            2 | 3 => spawn_one(world, "enemy2", random_x(), 0.0),
+            4 => spawn_one(world, "enemy1", random_x(), 0.0),
             _ => unreachable!(),
         }
     }
 
     if count == 4000 {
-        spawn_one(world, "boss1", WIDTH / 2.0 - 100.0, -200.0);
+        spawn_one(world, "boss1", WIDTH / 2.0 - 50.0, -200.0);
     }
 
     if count == 7000 {

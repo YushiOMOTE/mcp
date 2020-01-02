@@ -1,5 +1,4 @@
 use super::*;
-use specs::prelude::*;
 
 macro_rules! motion {
     ($($name:tt),*) => {
@@ -23,5 +22,6 @@ macro_rules! motion {
 }
 
 motion! {
-    sample
+    constant,
+    wave
 }
