@@ -78,6 +78,7 @@ pub fn user_shoot(world: &mut World) {
                 .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                 .with(Vel::new(0.0, -10.0))
                 .with(Bullet::player(8))
+                .with(Lifetime::Frameout)
                 .build();
         }
         4..=5 => {
@@ -93,6 +94,7 @@ pub fn user_shoot(world: &mut World) {
                     .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                     .with(Vel::new(0.0, -10.0))
                     .with(Bullet::player(5))
+                    .with(Lifetime::Frameout)
                     .build();
             }
         }
@@ -109,6 +111,7 @@ pub fn user_shoot(world: &mut World) {
                     .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                     .with(Vel::new(0.0, -10.0))
                     .with(Bullet::player(4))
+                    .with(Lifetime::Frameout)
                     .build();
             }
         }
@@ -129,6 +132,7 @@ pub fn user_shoot(world: &mut World) {
                     .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                     .with(Vel::new(sx, sy))
                     .with(Bullet::player(4))
+                    .with(Lifetime::Frameout)
                     .build();
             }
         }
@@ -149,6 +153,7 @@ pub fn user_shoot(world: &mut World) {
                     .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
                     .with(Vel::new(sx, sy))
                     .with(Bullet::player(4))
+                    .with(Lifetime::Frameout)
                     .build();
             }
         }
