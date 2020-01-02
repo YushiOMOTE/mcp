@@ -1,26 +1,15 @@
-use crate::{components::*, resources::*, utils::*};
+use crate::{
+    animations::*,
+    components::*,
+    features::{self, *},
+    resources::*,
+    utils::*,
+};
 use derive_new::new;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde::Deserialize;
 use serde_yaml::Value;
 use specs::prelude::*;
 use std::collections::HashMap;
-
-mod attack;
-mod motion;
-
-pub fn parse<T: DeserializeOwned>(value: &Value) -> T {
-    serde_yaml::from_value(value.clone()).expect("Couldn't parse config")
-}
-
-pub fn init(world: &mut World) {
-    attack::init(world);
-    motion::init(world);
-}
-
-pub fn update(world: &mut World) {
-    attack::update(world);
-    motion::update(world);
-}
 
 pub fn spawn_one(world: &mut World, name: &str, x: f32, y: f32) {
     let cfg = {
@@ -31,9 +20,15 @@ pub fn spawn_one(world: &mut World, name: &str, x: f32, y: f32) {
             .clone()
     };
 
-    let animation = cfg.animation.iter().fold(Animation::empty(), |a, f| {
-        a.add(AssetId::new(f.aid), f.time)
-    });
+    let animation = {
+        let animations = world.fetch::<AnimationResource>();
+        animations
+            .get(&cfg.animation)
+            .iter()
+            .fold(Animation::empty(), |a, f| {
+                a.add(AssetId::new(f.aid), f.time)
+            })
+    };
 
     let builder = world
         .create_entity()
@@ -42,13 +37,15 @@ pub fn spawn_one(world: &mut World, name: &str, x: f32, y: f32) {
         .with(animation)
         .with(Lifetime::Frameout)
         .with(Vel::new(0.0, 0.0));
-    let builder = cfg.motion.iter().fold(builder, |b, m| motion::setup(b, m));
-    let builder = cfg.attack.iter().fold(builder, |b, m| attack::setup(b, m));
+    let builder = cfg
+        .features
+        .iter()
+        .fold(builder, |b, m| features::setup(b, m.clone()));
 
     builder.build();
 }
 
-#[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(new, Debug, Default, Clone, Deserialize)]
 pub struct EnemiesConfig {
     #[serde(flatten)]
     enemies: HashMap<String, EnemyConfig>,
@@ -61,37 +58,12 @@ impl EnemiesConfig {
     }
 }
 
-#[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
+#[derive(new, Debug, Default, Clone, Deserialize)]
 pub struct EnemyConfig {
     life: u64,
     size: (f32, f32),
-    animation: Vec<FrameConfig>,
-    motion: Vec<MotionConfig>,
-    attack: Vec<AttackConfig>,
-}
-
-#[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
-pub struct FrameConfig {
-    aid: u64,
-    time: u64,
-}
-
-#[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
-pub struct AttackConfig {
-    name: String,
-    damage: u64,
-    frequency: u64,
-    size: (f32, f32),
-    animation: Vec<FrameConfig>,
-    #[serde(flatten)]
-    params: Value,
-}
-
-#[derive(new, Debug, Default, Clone, Serialize, Deserialize)]
-pub struct MotionConfig {
-    name: String,
-    #[serde(flatten)]
-    params: Value,
+    animation: String,
+    features: Vec<FeatureConfig>,
 }
 
 pub fn spawn(world: &mut World) {

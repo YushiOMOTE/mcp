@@ -1,8 +1,10 @@
+mod animations;
 mod assets;
 mod background;
 mod components;
 mod effect;
 mod enemies;
+mod features;
 mod items;
 mod resources;
 mod state;

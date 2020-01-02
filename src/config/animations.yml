@@ -1,0 +1,23 @@
+enemy_large:
+  - aid: 2
+    time: 10
+  - aid: 10002
+    time: 10
+enemy_medium:
+  - aid: 11
+    time: 5
+  - aid: 10011
+    time: 5
+enemy_small:
+  - aid: 10
+    time: 10
+  - aid: 10010
+    time: 10
+bullet:
+  - aid: 3
+    time: 10
+  - aid: 10003
+    time: 10
+boss:
+  - aid: 5
+    time: 1

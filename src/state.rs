@@ -1,4 +1,7 @@
-use crate::{assets::*, background::*, components::*, enemies, items, resources::*, systems::*};
+use crate::{
+    animations, assets::*, background::*, components::*, enemies, features, items, resources::*,
+    systems::*,
+};
 use quicksilver::{
     graphics::Color,
     input::{ButtonState, Key},
@@ -18,6 +21,7 @@ impl State for Play {
 
         world.insert(Context::new());
         world.insert(enemies::EnemiesConfig::from_static_file());
+        world.insert(animations::AnimationResource::from_static_file());
         world.register::<Vel>();
         world.register::<Pos>();
         world.register::<Bound>();
@@ -29,7 +33,7 @@ impl State for Play {
         world.register::<Bullet>();
         world.register::<Item>();
 
-        enemies::init(&mut world);
+        features::init(&mut world);
 
         background_spawn(&mut world);
 
@@ -97,7 +101,7 @@ impl State for Play {
         BulletCollisions.run_now(&mut self.world);
         EnemyCollisions.run_now(&mut self.world);
         ItemCollisions.run_now(&mut self.world);
-        enemies::update(&mut self.world);
+        features::update(&mut self.world);
         self.world.maintain();
 
         Ok(())

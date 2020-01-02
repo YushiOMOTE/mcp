@@ -1,93 +1,59 @@
 enemy1: # Heavy
   life: 100
   size: [26.0, 30.0]
-  animation:
-    - aid: 2
-      time: 10
-    - aid: 10002
-      time: 10
-  motion:
-    - name: constant
+  animation: enemy_large
+  features:
+    - name: linear_move
       vel: [0.0, 0.8]
-  attack:
-    - name: normal
+    - name: radial_attack
       damage: 10
       frequency: 200
       size: [10.0, 10.0]
       vel: 2.0
       range: 1.57
-      count: 7
-      animation:
-        - aid: 3
-          time: 10
-        - aid: 10003
-          time: 10
+      num: 7
+      animation: bullet
 enemy2: # Speedy
   life: 20
   size: [32.0, 16.0]
-  animation:
-    - aid: 11
-      time: 5
-    - aid: 10011
-      time: 5
-  motion:
-    - name: constant
+  animation: enemy_medium
+  features:
+    - name: linear_move
       vel: [0.0, 2.0]
-  attack:
-    - name: normal
+    - name: radial_attack
       damage: 10
       frequency: 100
       size: [10.0, 10.0]
       vel: 8.0
-      animation:
-        - aid: 3
-          time: 10
-        - aid: 10003
-          time: 10
+      animation: bullet
 enemy3: # Small
   life: 3
   size: [16.0, 16.0]
-  animation:
-    - aid: 10
-      time: 10
-    - aid: 10010
-      time: 10
-  motion:
-    - name: constant
+  animation: enemy_small
+  features:
+    - name: linear_move
       vel: [0.0, 0.8]
-  attack:
-    - name: normal
+    - name: radial_attack
       damage: 10
       frequency: 100
       size: [8.0, 8.0]
       vel: 2.0
-      animation:
-        - aid: 3
-          time: 10
-        - aid: 10003
-          time: 10
+      animation: bullet
 boss1:
   life: 2000
   size: [100.0, 100.0]
-  animation:
-    - aid: 5
-      time: 1
-  motion:
-    - name: constant
+  animation: boss
+  features:
+    - name: linear_move
       vel: [0.0, 0.2]
-    - name: wave
+    - name: wave_move
       width: 2.0
       freq: 300
-  attack:
-    - name: normal
+    - name: radial_attack
       damage: 20
       frequency: 100
       size: [12.0, 12.0]
       vel: 2.0
       range: 6.28
-      count: 24
-      animation:
-        - aid: 3
-          time: 10
-        - aid: 10003
-          time: 10
+      num: 24
+      animation: bullet
