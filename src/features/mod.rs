@@ -16,7 +16,7 @@ pub struct FeatureConfig {
 
 macro_rules! features {
     ($($name:tt),*) => {
-        $(mod $name;)*
+        $(pub mod $name;)*
 
         pub fn init(world: &mut World) {
             $(world.register::<$name::Tag>();)*
@@ -38,5 +38,7 @@ macro_rules! features {
 features! {
     linear_move,
     wave_move,
-    radial_attack
+    radial_attack,
+    control,
+    shooter
 }

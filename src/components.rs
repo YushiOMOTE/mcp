@@ -128,3 +128,6 @@ pub enum Lifetime {
     Timer(u64),
     Scroll(f32),
 }
+
+#[derive(new, Component, Debug, Clone)]
+pub struct MustLive;

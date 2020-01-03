@@ -9,6 +9,7 @@ mod items;
 mod resources;
 mod state;
 mod systems;
+mod user;
 mod utils;
 
 use quicksilver::{

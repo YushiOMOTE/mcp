@@ -203,3 +203,13 @@ impl<'a> System<'a> for ItemCollisions {
         }
     }
 }
+
+pub struct CheckGameOver;
+
+impl<'a> System<'a> for CheckGameOver {
+    type SystemData = (Write<'a, Context>, ReadStorage<'a, MustLive>);
+
+    fn run(&mut self, (mut ctx, must): Self::SystemData) {
+        ctx.gameover = (&must).join().count() == 0;
+    }
+}
