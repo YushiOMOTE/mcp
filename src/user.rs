@@ -15,7 +15,7 @@ impl UserConfig {
 
 pub fn spawn(world: &mut World) {
     let animation = {
-        let animations = world.fetch::<AnimationResource>();
+        let animations = world.fetch::<AnimationConfig>();
         let cfg = world.fetch::<UserConfig>();
         animations.get(&cfg.animation)
     };

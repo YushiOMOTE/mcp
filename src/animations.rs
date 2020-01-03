@@ -10,9 +10,9 @@ pub struct FrameConfig {
 }
 
 #[derive(new, Debug, Default, Clone, Deserialize)]
-pub struct AnimationResource(HashMap<String, Vec<FrameConfig>>);
+pub struct AnimationConfig(HashMap<String, Vec<FrameConfig>>);
 
-impl AnimationResource {
+impl AnimationConfig {
     pub fn get(&self, name: &str) -> Animation {
         let frames = self
             .0
@@ -24,7 +24,7 @@ impl AnimationResource {
     }
 }
 
-impl AnimationResource {
+impl AnimationConfig {
     pub fn from_static_file() -> Self {
         serde_yaml::from_str(include_str!("config/animations.yml"))
             .expect("Couldn't parse animations file")

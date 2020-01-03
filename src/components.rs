@@ -68,7 +68,7 @@ pub struct Animation {
     frames: Vec<Frame>,
 }
 
-#[derive(Default, Component, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AssetId(pub String);
 
 impl AssetId {

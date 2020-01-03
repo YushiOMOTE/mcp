@@ -1,7 +1,7 @@
 use crate::{components::*, resources::*};
 use specs::prelude::*;
 
-pub fn background_spawn<'a>(world: &mut World) {
+pub fn spawn<'a>(world: &mut World) {
     world
         .create_entity()
         .with(Pos::new(0.0, -HEIGHT * 2.0, -1.0, WIDTH, HEIGHT * 2.0))

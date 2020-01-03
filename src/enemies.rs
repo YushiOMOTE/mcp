@@ -20,7 +20,7 @@ pub fn spawn_one(world: &mut World, name: &str, x: f32, y: f32) {
     };
 
     let animation = {
-        let animations = world.fetch::<AnimationResource>();
+        let animations = world.fetch::<AnimationConfig>();
         animations.get(&cfg.animation)
     };
 

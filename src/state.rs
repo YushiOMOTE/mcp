@@ -1,5 +1,5 @@
 use crate::{
-    animations, assets::*, background::*, components::*, enemies, features, items, resources::*,
+    animations, assets::*, background, components::*, enemies, features, items, resources::*,
     systems::*, user,
 };
 use quicksilver::{
@@ -21,7 +21,7 @@ impl State for Play {
 
         world.insert(Context::new());
         world.insert(Events::new());
-        world.insert(animations::AnimationResource::from_static_file());
+        world.insert(animations::AnimationConfig::from_static_file());
         world.insert(user::UserConfig::from_static_file());
         world.insert(enemies::EnemiesConfig::from_static_file());
         world.register::<Vel>();
@@ -29,7 +29,6 @@ impl State for Play {
         world.register::<Bound>();
         world.register::<Lifetime>();
         world.register::<Animation>();
-        world.register::<AssetId>();
         world.register::<Player>();
         world.register::<Enemy>();
         world.register::<Bullet>();
@@ -38,7 +37,7 @@ impl State for Play {
 
         features::init(&mut world);
 
-        background_spawn(&mut world);
+        background::spawn(&mut world);
         user::spawn(&mut world);
 
         let asset_cfg = AssetsConfig::from_static_file();

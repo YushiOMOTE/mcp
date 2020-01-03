@@ -31,7 +31,7 @@ impl<'a> System<'a> for Action {
         Entities<'a>,
         Read<'a, LazyUpdate>,
         Read<'a, Context>,
-        Read<'a, AnimationResource>,
+        Read<'a, AnimationConfig>,
         ReadStorage<'a, Pos>,
         ReadStorage<'a, Tag>,
     );
