@@ -1,182 +1,99 @@
 use crate::components::*;
 use futures::*;
-use quicksilver::graphics::{Background::Col, Color};
 use quicksilver::prelude::*;
+use serde::Deserialize;
 use std::collections::HashMap;
 
-pub struct Assets {
-    loading: Box<dyn Future<Item = HashMap<AssetId, Image>, Error = quicksilver::Error>>,
-    assets: Option<HashMap<AssetId, Image>>,
+type Loading = Box<dyn Future<Item = HashMap<AssetId, Image>, Error = String>>;
+
+#[derive(Deserialize, Clone, Debug)]
+pub struct AssetConfig {
+    name: String,
+    crop: Option<(f32, f32, f32, f32)>,
 }
 
-fn load_assets() -> Box<dyn Future<Item = HashMap<AssetId, Image>, Error = quicksilver::Error>> {
-    let mut map = HashMap::new();
+#[derive(Deserialize, Clone, Debug)]
+pub struct AssetsConfig(HashMap<String, Vec<AssetConfig>>);
 
-    let fut = Image::load("ship.png")
-        .map(move |img| {
-            map.insert(
-                AssetId::new(0),
-                img.subimage(Rectangle::new((32.0, 0.0), (16.0, 24.0))),
-            );
-            map.insert(
-                AssetId::new(10000),
-                img.subimage(Rectangle::new((32.0, 24.0), (16.0, 24.0))),
-            );
-            map
-        })
-        .and_then(|map| Image::load("laser-bolts.png").map(move |img| (map, img)))
-        .map(|(mut map, img)| {
-            map.insert(
-                AssetId::new(1),
-                img.subimage(Rectangle::new((6.0, 18.0), (5.0, 12.0))),
-            );
-            map.insert(
-                AssetId::new(10001),
-                img.subimage(Rectangle::new((20.0, 18.0), (5.0, 12.0))),
-            );
+impl AssetsConfig {
+    pub fn from_static_file() -> Self {
+        serde_yaml::from_str(include_str!("config/assets.yml")).expect("Couldn't parse assets file")
+    }
+}
 
-            map.insert(
-                AssetId::new(3),
-                img.subimage(Rectangle::new((6.0, 7.0), (5.0, 5.0))),
-            );
-            map.insert(
-                AssetId::new(10003),
-                img.subimage(Rectangle::new((20.0, 7.0), (5.0, 5.0))),
-            );
-            map
-        })
-        .and_then(|map| Image::load("enemy-small.png").map(move |img| (map, img)))
-        .map(|(mut map, img)| {
-            map.insert(
-                AssetId::new(10),
-                img.subimage(Rectangle::new((0.0, 0.0), (16.0, 16.0))),
-            );
-            map.insert(
-                AssetId::new(10010),
-                img.subimage(Rectangle::new((16.0, 0.0), (16.0, 16.0))),
-            );
-            map
-        })
-        .and_then(|map| Image::load("enemy-medium.png").map(move |img| (map, img)))
-        .map(|(mut map, img)| {
-            map.insert(
-                AssetId::new(11),
-                img.subimage(Rectangle::new((0.0, 0.0), (32.0, 16.0))),
-            );
-            map.insert(
-                AssetId::new(10011),
-                img.subimage(Rectangle::new((32.0, 0.0), (32.0, 16.0))),
-            );
-            map
-        })
-        .and_then(|map| Image::load("enemy-big.png").map(move |img| (map, img)))
-        .map(|(mut map, img)| {
-            map.insert(
-                AssetId::new(2),
-                img.subimage(Rectangle::new((3.0, 2.0), (26.0, 30.0))),
-            );
-            map.insert(
-                AssetId::new(10002),
-                img.subimage(Rectangle::new((35.0, 2.0), (26.0, 30.0))),
-            );
-            map
-        })
-        .and_then(|map| Image::load("boss.png").map(move |img| (map, img)))
-        .map(|(mut map, img)| {
-            map.insert(AssetId::new(5), img.clone());
-            map.insert(AssetId::new(10005), img);
-            map
-        })
-        .and_then(|map| Image::load("explosion.png").map(move |img| (map, img)))
-        .map(|(mut map, img)| {
-            map.insert(
-                AssetId::new(6),
-                img.subimage(Rectangle::new((0.0, 0.0), (15.0, 16.0))),
-            );
-            map.insert(
-                AssetId::new(10006),
-                img.subimage(Rectangle::new((15.0, 0.0), (15.0, 16.0))),
-            );
-            map.insert(
-                AssetId::new(20006),
-                img.subimage(Rectangle::new((32.0, 0.0), (15.0, 16.0))),
-            );
-            map.insert(
-                AssetId::new(30006),
-                img.subimage(Rectangle::new((48.0, 0.0), (15.0, 16.0))),
-            );
-            map
-        })
-        .and_then(|map| Image::load("background.png").map(move |img| (map, img)))
-        .map(|(mut map, img)| {
-            map.insert(AssetId::new(7), img.clone());
-            map.insert(AssetId::new(10007), img);
-            map
-        })
-        .and_then(|map| Image::load("power-up.png").map(move |img| (map, img)))
-        .map(|(mut map, img)| {
-            map.insert(
-                AssetId::new(9),
-                img.subimage(Rectangle::new((0.0, 0.0), (16.0, 16.0))),
-            );
-            map.insert(
-                AssetId::new(10009),
-                img.subimage(Rectangle::new((16.0, 0.0), (16.0, 16.0))),
-            );
-            map
-        });
+pub struct Assets {
+    assets: HashMap<AssetId, Image>,
+    loader: Vec<Loading>,
+}
 
-    Box::new(fut)
+fn load_assets(cfg: &AssetsConfig) -> Vec<Loading> {
+    cfg.0
+        .clone()
+        .into_iter()
+        .map(|(name, assets)| {
+            let img = Image::load(name.clone());
+            let ename = name.clone();
+
+            let fut = img
+                .map(move |img| {
+                    let mut map = HashMap::new();
+
+                    for asset in assets {
+                        let img = match asset.crop {
+                            Some(crop) => {
+                                img.subimage(Rectangle::new((crop.0, crop.1), (crop.2, crop.3)))
+                            }
+                            None => img.clone(),
+                        };
+                        map.insert(AssetId::new(asset.name.clone()), img);
+                    }
+
+                    map
+                })
+                .map_err(move |e| format!("Couldn't load asset: {}: {}", ename, e));
+
+            Box::new(fut) as Loading
+        })
+        .collect()
 }
 
 impl Assets {
-    pub fn new() -> Self {
+    pub fn new(cfg: &AssetsConfig) -> Self {
         Self {
-            loading: load_assets(),
-            assets: None,
+            loader: load_assets(cfg),
+            assets: HashMap::new(),
         }
     }
 
-    pub fn is_ready(&self) -> bool {
-        self.assets.is_some()
-    }
-
-    pub fn poll(&mut self) {
-        if self.is_ready() {
-            return;
-        }
-
-        match self.loading.poll() {
-            Ok(Async::Ready(res)) => {
-                self.assets = Some(res);
+    fn poll(&mut self) {
+        while !self.loader.is_empty() {
+            match self.loader.last_mut().poll() {
+                Ok(Async::Ready(map)) => {
+                    for m in map {
+                        self.assets.extend(m);
+                    }
+                }
+                Ok(Async::NotReady) => return,
+                Err(e) => panic!("Poll error: {}", e),
             }
-            _ => {}
+            self.loader.pop();
         }
     }
 
-    pub fn draw(&self, window: &mut Window, animation: &Animation, pos: &Pos, count: u64) {
-        let asset = animation.get(count);
+    pub fn draw(&mut self, window: &mut Window, animation: &Animation, pos: &Pos, count: u64) {
+        self.poll();
 
-        let col = match asset.0 {
-            0 => Col(Color::RED),
-            1 => Col(Color::BLUE),
-            2 => Col(Color::GREEN),
-            _ => Col(Color::YELLOW),
+        let asset = animation.get(count);
+        let asset = match self.assets.get(&asset) {
+            Some(asset) => asset,
+            None => return,
         };
 
-        match self.assets.as_ref().unwrap().get(&asset) {
-            Some(img) => window.draw_ex(
-                &Rectangle::new((pos.x, pos.y), (pos.w, pos.h)),
-                Img(&img),
-                Transform::IDENTITY,
-                pos.z,
-            ),
-            None => window.draw_ex(
-                &Rectangle::new((pos.x, pos.y), (pos.w, pos.h)),
-                col,
-                Transform::IDENTITY,
-                pos.z,
-            ),
-        }
+        window.draw_ex(
+            &Rectangle::new((pos.x, pos.y), (pos.w, pos.h)),
+            Img(asset),
+            Transform::IDENTITY,
+            pos.z,
+        );
     }
 }

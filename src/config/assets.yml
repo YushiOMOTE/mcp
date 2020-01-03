@@ -1,0 +1,47 @@
+ship.png:
+  - name: ship1
+    crop: [32.0, 0.0, 16.0, 24.0]
+  - name: ship2
+    crop: [32.0, 24.0, 16.0, 24.0]
+laser-bolts.png:
+  - name: shot_a1
+    crop: [6.0, 18.0, 5.0, 12.0]
+  - name: shot_a2
+    crop: [20.0, 18.0, 5.0, 12.0]
+  - name: shot_b1
+    crop: [6.0, 7.0, 5.0, 5.0]
+  - name: shot_b2
+    crop: [20.0, 7.0, 5.0, 5.0]
+enemy-small.png:
+  - name: enemy_s1
+    crop: [0.0, 0.0, 16.0, 16.0]
+  - name: enemy_s2
+    crop: [16.0, 0.0, 16.0, 16.0]
+enemy-medium.png:
+  - name: enemy_m1
+    crop: [0.0, 0.0, 32.0, 16.0]
+  - name: enemy_m2
+    crop: [32.0, 0.0, 32.0, 16.0]
+enemy-big.png:
+  - name: enemy_l1
+    crop: [3.0, 2.0, 26.0, 30.0]
+  - name: enemy_l2
+    crop: [35.0, 2.0, 26.0, 30.0]
+explosion.png:
+  - name: explosion_a1
+    crop: [0.0, 0.0, 15.0, 16.0]
+  - name: explosion_a2
+    crop: [15.0, 0.0, 15.0, 16.0]
+  - name: explosion_a3
+    crop: [32.0, 0.0, 15.0, 16.0]
+  - name: explosion_a4
+    crop: [48.0, 0.0, 15.0, 16.0]
+boss.png:
+  - name: boss
+background.png:
+  - name: background
+power-up.png:
+  - name: power_a1
+    crop: [0.0, 0.0, 16.0, 16.0]
+  - name: power_a2
+    crop: [16.0, 0.0, 16.0, 16.0]

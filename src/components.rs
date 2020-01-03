@@ -68,8 +68,14 @@ pub struct Animation {
     frames: Vec<Frame>,
 }
 
-#[derive(new, Default, Component, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct AssetId(pub u64);
+#[derive(Default, Component, Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AssetId(pub String);
+
+impl AssetId {
+    pub fn new<T: ToString>(aid: T) -> Self {
+        Self(aid.to_string())
+    }
+}
 
 #[derive(new, Default, Debug, Clone)]
 pub struct Frame {
@@ -93,14 +99,14 @@ impl Animation {
         self
     }
 
-    fn sums(&self) -> Vec<(u64, u64, AssetId)> {
+    fn sums(&self) -> Vec<(u64, u64, &AssetId)> {
         self.frames
             .iter()
             .scan(0, |state, f| {
                 let min = *state;
                 *state = *state + f.time;
                 let max = *state;
-                Some((min, max, f.aid))
+                Some((min, max, &f.aid))
             })
             .collect()
     }
@@ -111,7 +117,7 @@ impl Animation {
 
         sums.iter()
             .find(|(min, max, _)| min <= &count && &count < max)
-            .map(|(_, _, aid)| *aid)
+            .map(|(_, _, aid)| (*aid).clone())
             .expect("Invalid image state")
     }
 }

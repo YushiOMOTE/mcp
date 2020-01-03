@@ -1,4 +1,5 @@
-use crate::components::*;
+use crate::{animations::*, components::*};
+use serde::Deserialize;
 use specs::prelude::*;
 
 pub const WIDTH: f32 = 800.0;
@@ -19,28 +20,43 @@ impl Context {
     }
 }
 
+#[derive(Default, Clone, Deserialize)]
+pub struct UserConfig {
+    animation: String,
+}
+
+impl UserConfig {
+    pub fn from_static_file() -> Self {
+        serde_yaml::from_str(include_str!("config/user.yml")).expect("Couldn't parse user file")
+    }
+}
+
 #[derive(Default, Clone)]
 pub struct User {
     pub entity: Option<Entity>,
 }
 
 impl User {
-    pub fn new(entity: Entity) -> Self {
+    pub fn new(world: &mut World) -> Self {
+        let animation = {
+            let animations = world.fetch::<AnimationResource>();
+            let cfg = world.fetch::<UserConfig>();
+            animations.get(&cfg.animation)
+        };
+
+        let entity = world
+            .create_entity()
+            .with(Pos::new(WIDTH / 2.0, HEIGHT * 0.9, 0.0, 16.0, 24.0))
+            .with(Player::new(150, 0))
+            .with(Vel::new(0.0, 0.0))
+            .with(Bound::new(0.0, 0.0, WIDTH, HEIGHT))
+            .with(animation)
+            .build();
+
         Self {
             entity: Some(entity),
         }
     }
-}
-
-pub fn user_spawn(world: &mut World) -> Entity {
-    world
-        .create_entity()
-        .with(Pos::new(WIDTH / 2.0, HEIGHT * 0.9, 0.0, 16.0, 24.0))
-        .with(Player::new(150, 0))
-        .with(Vel::new(0.0, 0.0))
-        .with(Bound::new(0.0, 0.0, WIDTH, HEIGHT))
-        .with(Animation::new(AssetId::new(0), 10).add(AssetId::new(10000), 10))
-        .build()
 }
 
 pub fn user_clear_y(world: &mut World) {
@@ -75,7 +91,7 @@ pub fn user_shoot(world: &mut World) {
             world
                 .create_entity()
                 .with(pos)
-                .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+                .with(Animation::new(AssetId::new("shot_a1"), 10).add(AssetId::new("shot_a2"), 10))
                 .with(Vel::new(0.0, -10.0))
                 .with(Bullet::player(8))
                 .with(Lifetime::Frameout)
@@ -91,7 +107,10 @@ pub fn user_shoot(world: &mut World) {
                 world
                     .create_entity()
                     .with(pos)
-                    .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+                    .with(
+                        Animation::new(AssetId::new("shot_a1"), 10)
+                            .add(AssetId::new("shot_a2"), 10),
+                    )
                     .with(Vel::new(0.0, -10.0))
                     .with(Bullet::player(5))
                     .with(Lifetime::Frameout)
@@ -108,7 +127,10 @@ pub fn user_shoot(world: &mut World) {
                 world
                     .create_entity()
                     .with(pos)
-                    .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+                    .with(
+                        Animation::new(AssetId::new("shot_a1"), 10)
+                            .add(AssetId::new("shot_a2"), 10),
+                    )
                     .with(Vel::new(0.0, -10.0))
                     .with(Bullet::player(4))
                     .with(Lifetime::Frameout)
@@ -129,7 +151,10 @@ pub fn user_shoot(world: &mut World) {
                 world
                     .create_entity()
                     .with(pos)
-                    .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+                    .with(
+                        Animation::new(AssetId::new("shot_a1"), 10)
+                            .add(AssetId::new("shot_a2"), 10),
+                    )
                     .with(Vel::new(sx, sy))
                     .with(Bullet::player(4))
                     .with(Lifetime::Frameout)
@@ -150,7 +175,10 @@ pub fn user_shoot(world: &mut World) {
                 world
                     .create_entity()
                     .with(pos)
-                    .with(Animation::new(AssetId::new(1), 10).add(AssetId::new(10001), 10))
+                    .with(
+                        Animation::new(AssetId::new("shot_a1"), 10)
+                            .add(AssetId::new("shot_a2"), 10),
+                    )
                     .with(Vel::new(sx, sy))
                     .with(Bullet::player(4))
                     .with(Lifetime::Frameout)

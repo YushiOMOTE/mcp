@@ -42,12 +42,7 @@ impl<'a> System<'a> for Action {
                 continue;
             }
 
-            let animation = animations
-                .get(&tag.animation)
-                .iter()
-                .fold(Animation::empty(), |a, f| {
-                    a.add(AssetId::new(f.aid), f.time)
-                });
+            let animation = animations.get(&tag.animation);
 
             for i in 0..tag.num {
                 let (vx, vy) = if tag.num > 1 {

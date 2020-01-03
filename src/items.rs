@@ -13,7 +13,7 @@ pub fn spawn<'a>(world: &mut World) {
         .with(Pos::new(random_x(), 0.0, 0.0, 20.0, 20.0))
         .with(Vel::new(0.0, 0.4))
         .with(Item::new(1))
-        .with(Animation::new(AssetId::new(9), 20).add(AssetId::new(10009), 20))
+        .with(Animation::new(AssetId::new("power_a1"), 20).add(AssetId::new("power_a2"), 20))
         .with(Lifetime::Frameout)
         .build();
 }

@@ -3,10 +3,10 @@ use specs::prelude::*;
 use specs::world::LazyBuilder;
 
 pub fn bomb_spawn<'a>(e: LazyBuilder<'a>, pos: &Pos) {
-    let animation = Animation::new(AssetId::new(6), 5)
-        .add(AssetId::new(10006), 5)
-        .add(AssetId::new(20006), 5)
-        .add(AssetId::new(30006), 5);
+    let animation = Animation::new(AssetId::new("explosion_a1"), 5)
+        .add(AssetId::new("explosion_a2"), 5)
+        .add(AssetId::new("explosion_a3"), 5)
+        .add(AssetId::new("explosion_a4"), 5);
     let mut pos = pos.clone();
     pos.w = 20.0;
     pos.h = 20.0;

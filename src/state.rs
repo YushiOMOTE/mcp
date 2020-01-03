@@ -20,8 +20,9 @@ impl State for Play {
         let mut world = World::new();
 
         world.insert(Context::new());
-        world.insert(enemies::EnemiesConfig::from_static_file());
         world.insert(animations::AnimationResource::from_static_file());
+        world.insert(UserConfig::from_static_file());
+        world.insert(enemies::EnemiesConfig::from_static_file());
         world.register::<Vel>();
         world.register::<Pos>();
         world.register::<Bound>();
@@ -37,21 +38,18 @@ impl State for Play {
 
         background_spawn(&mut world);
 
-        let e = user_spawn(&mut world);
+        let user = User::new(&mut world);
+        world.insert(user);
 
-        world.insert(User::new(e));
+        let asset_cfg = AssetsConfig::from_static_file();
 
         Ok(Self {
             world,
-            assets: Some(Assets::new()),
+            assets: Some(Assets::new(&asset_cfg)),
         })
     }
 
     fn event(&mut self, event: &Event, window: &mut Window) -> Result<()> {
-        if !self.assets.as_ref().unwrap().is_ready() {
-            return Ok(());
-        }
-
         println!("{:?}", event);
 
         match *event {
@@ -91,11 +89,6 @@ impl State for Play {
     }
 
     fn update(&mut self, _window: &mut Window) -> Result<()> {
-        if !self.assets.as_ref().unwrap().is_ready() {
-            self.assets.as_mut().unwrap().poll();
-            return Ok(());
-        }
-
         MoveObjects.run_now(&mut self.world);
         MaintainLifetime.run_now(&mut self.world);
         BulletCollisions.run_now(&mut self.world);
@@ -113,11 +106,6 @@ impl State for Play {
         {
             enemies::spawn(&mut self.world);
             items::spawn(&mut self.world);
-        }
-
-        if !self.assets.as_ref().unwrap().is_ready() {
-            window.clear(Color::BLACK)?;
-            return Ok(());
         }
 
         {

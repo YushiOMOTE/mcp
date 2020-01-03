@@ -7,7 +7,6 @@ use crate::{
 };
 use derive_new::new;
 use serde::Deserialize;
-use serde_yaml::Value;
 use specs::prelude::*;
 use std::collections::HashMap;
 
@@ -22,12 +21,7 @@ pub fn spawn_one(world: &mut World, name: &str, x: f32, y: f32) {
 
     let animation = {
         let animations = world.fetch::<AnimationResource>();
-        animations
-            .get(&cfg.animation)
-            .iter()
-            .fold(Animation::empty(), |a, f| {
-                a.add(AssetId::new(f.aid), f.time)
-            })
+        animations.get(&cfg.animation)
     };
 
     let builder = world

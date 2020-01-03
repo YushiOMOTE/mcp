@@ -1,23 +1,28 @@
 enemy_large:
-  - aid: 2
+  - aid: enemy_l1
     time: 10
-  - aid: 10002
+  - aid: enemy_l2
     time: 10
 enemy_medium:
-  - aid: 11
+  - aid: enemy_m1
     time: 5
-  - aid: 10011
+  - aid: enemy_m2
     time: 5
 enemy_small:
-  - aid: 10
+  - aid: enemy_s1
     time: 10
-  - aid: 10010
+  - aid: enemy_s2
     time: 10
 bullet:
-  - aid: 3
+  - aid: shot_b1
     time: 10
-  - aid: 10003
+  - aid: shot_b2
     time: 10
 boss:
-  - aid: 5
+  - aid: boss
     time: 1
+ship:
+  - aid: ship1
+    time: 10
+  - aid: ship2
+    time: 10
