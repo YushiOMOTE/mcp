@@ -1,4 +1,4 @@
-use crate::{animations::*, components::*, features, resources::*};
+use crate::{animations::*, components::*, extra, resources::*};
 use serde::Deserialize;
 use specs::prelude::*;
 
@@ -26,8 +26,8 @@ pub fn spawn(world: &mut World) {
         .with(Player::new(150, 0))
         .with(Vel::new(0.0, 0.0))
         .with(Bound::new(0.0, 0.0, WIDTH, HEIGHT))
-        .with(features::control::Tag { vel: 3.0 })
-        .with(features::shooter::Tag {})
+        .with(extra::control::Tag { vel: 3.0 })
+        .with(extra::shooter::Tag {})
         .with(animation)
         .with(MustLive)
         .build();

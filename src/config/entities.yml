@@ -1,8 +1,17 @@
+item:
+  size: [20.0, 20.0]
+  animation: item
+  components:
+    - name: item
+      id: 1
+    - name: linear_move
+      vel: [0.0, 0.6]
 enemy1: # Heavy
-  life: 100
   size: [26.0, 30.0]
   animation: enemy_large
-  features:
+  components:
+    - name: enemy
+      life: 100
     - name: linear_move
       vel: [0.0, 0.8]
     - name: radial_attack
@@ -14,10 +23,11 @@ enemy1: # Heavy
       num: 7
       animation: bullet
 enemy2: # Speedy
-  life: 20
   size: [32.0, 16.0]
   animation: enemy_medium
-  features:
+  components:
+    - name: enemy
+      life: 20
     - name: linear_move
       vel: [0.0, 2.0]
     - name: radial_attack
@@ -27,10 +37,11 @@ enemy2: # Speedy
       vel: 8.0
       animation: bullet
 enemy3: # Small
-  life: 3
   size: [16.0, 16.0]
   animation: enemy_small
-  features:
+  components:
+    - name: enemy
+      life: 3
     - name: linear_move
       vel: [0.0, 0.8]
     - name: radial_attack
@@ -40,10 +51,11 @@ enemy3: # Small
       vel: 2.0
       animation: bullet
 boss1:
-  life: 2000
   size: [100.0, 100.0]
   animation: boss
-  features:
+  components:
+    - name: enemy
+      life: 2000
     - name: linear_move
       vel: [0.0, 0.2]
     - name: wave_move

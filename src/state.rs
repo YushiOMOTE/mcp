@@ -1,6 +1,13 @@
 use crate::{
-    animations, assets::*, background, components::*, enemies, features, items, resources::*,
-    systems::*, user,
+    animations,
+    assets::*,
+    background,
+    components::{self, *},
+    entities, extra,
+    resources::*,
+    scenarios,
+    systems::*,
+    user,
 };
 use quicksilver::{
     graphics::Color,
@@ -9,6 +16,28 @@ use quicksilver::{
     Result,
 };
 use specs::prelude::*;
+
+components! {
+    ExtraComponents {
+        components::Enemy = "enemy",
+        components::Item = "item",
+        extra::linear_move::Tag = "linear_move",
+        extra::wave_move::Tag = "wave_move",
+        extra::radial_attack::Tag = "radial_attack",
+        extra::control::Tag = "control",
+        extra::shooter::Tag = "shooter",
+    }
+}
+
+systems! {
+    ExtraSystems {
+        extra::linear_move::Action,
+        extra::wave_move::Action,
+        extra::radial_attack::Action,
+        extra::control::Action,
+        extra::shooter::Action,
+    }
+}
 
 pub struct Play {
     world: World,
@@ -23,7 +52,8 @@ impl State for Play {
         world.insert(Events::new());
         world.insert(animations::AnimationConfig::from_static_file());
         world.insert(user::UserConfig::from_static_file());
-        world.insert(enemies::EnemiesConfig::from_static_file());
+        world.insert(entities::EntitiesConfig::from_static_file());
+        world.insert(scenarios::ScenarioConfig::from_static_file());
         world.register::<Vel>();
         world.register::<Pos>();
         world.register::<Bound>();
@@ -35,7 +65,7 @@ impl State for Play {
         world.register::<Item>();
         world.register::<MustLive>();
 
-        features::init(&mut world);
+        ExtraComponents.register(&mut world);
 
         background::spawn(&mut world);
         user::spawn(&mut world);
@@ -67,7 +97,7 @@ impl State for Play {
         BulletCollisions.run_now(&mut self.world);
         EnemyCollisions.run_now(&mut self.world);
         ItemCollisions.run_now(&mut self.world);
-        features::update(&mut self.world);
+        ExtraSystems.run_now(&mut self.world);
         self.world.fetch_mut::<Events>().clear();
         self.world.maintain();
         CheckGameOver.run_now(&mut self.world);
@@ -78,10 +108,7 @@ impl State for Play {
     fn draw(&mut self, window: &mut Window) -> Result<()> {
         self.world.fetch_mut::<Context>().update();
 
-        {
-            enemies::spawn(&mut self.world);
-            items::spawn(&mut self.world);
-        }
+        scenarios::spawn(&mut self.world);
 
         {
             if self.world.fetch::<Context>().gameover {

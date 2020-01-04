@@ -26,3 +26,8 @@ ship:
     time: 10
   - aid: ship2
     time: 10
+item:
+  - aid: power_a1
+    time: 10
+  - aid: power_a2
+    time: 10

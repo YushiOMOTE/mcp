@@ -1,12 +1,14 @@
+#[macro_use]
+mod extra;
+
 mod animations;
 mod assets;
 mod background;
 mod components;
 mod effect;
-mod enemies;
-mod features;
-mod items;
+mod entities;
 mod resources;
+mod scenarios;
 mod state;
 mod systems;
 mod user;

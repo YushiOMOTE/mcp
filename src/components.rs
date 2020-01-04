@@ -1,4 +1,5 @@
 use derive_new::new;
+use serde::Deserialize;
 use specs::prelude::*;
 use specs_derive::Component;
 
@@ -47,28 +48,28 @@ impl Bullet {
     }
 }
 
-#[derive(new, Default, Component, Debug, Clone)]
+#[derive(new, Default, Component, Deserialize, Debug, Clone)]
 pub struct Item {
     pub id: u64,
 }
 
-#[derive(new, Default, Component, Debug, Clone)]
+#[derive(new, Default, Component, Deserialize, Debug, Clone)]
 pub struct Player {
     pub life: u64,
     pub level: u64,
 }
 
-#[derive(new, Default, Component, Debug, Clone)]
+#[derive(new, Default, Component, Deserialize, Debug, Clone)]
 pub struct Enemy {
     pub life: u64,
 }
 
-#[derive(Default, Component, Debug, Clone)]
+#[derive(Default, Component, Deserialize, Debug, Clone)]
 pub struct Animation {
     frames: Vec<Frame>,
 }
 
-#[derive(Default, Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Default, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AssetId(pub String);
 
 impl AssetId {
@@ -77,7 +78,7 @@ impl AssetId {
     }
 }
 
-#[derive(new, Default, Debug, Clone)]
+#[derive(new, Deserialize, Default, Debug, Clone)]
 pub struct Frame {
     pub aid: AssetId,
     pub time: u64,
@@ -122,12 +123,12 @@ impl Animation {
     }
 }
 
-#[derive(new, Component, Debug, Clone)]
+#[derive(new, Component, Deserialize, Debug, Clone)]
 pub enum Lifetime {
     Frameout,
     Timer(u64),
     Scroll(f32),
 }
 
-#[derive(new, Component, Debug, Clone)]
+#[derive(new, Component, Deserialize, Debug, Clone)]
 pub struct MustLive;

@@ -8,6 +8,7 @@ pub fn bomb_spawn<'a>(e: LazyBuilder<'a>, pos: &Pos) {
         .add(AssetId::new("explosion_a3"), 5)
         .add(AssetId::new("explosion_a4"), 5);
     let mut pos = pos.clone();
+    pos.z = 1.0;
     pos.w = 20.0;
     pos.h = 20.0;
     e.with(animation)

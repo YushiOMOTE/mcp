@@ -1,7 +1,24 @@
-- during: [0, 1000]
-  spawn: enemy1
-  freq: 400
-  pos: [random_x, 0.0]
-- at: 4000
-  spawn: enemy1
-  pos: [10.0, 10.0]
+- time: [0, 4000]
+  spawn:
+    - freq: 210
+      spawn: enemy3
+      pos: [[0.0, 800.0], -10.0]
+- time: [1000, 4000]
+  spawn:
+    - freq: 220
+      spawn: enemy2
+      pos: [[0.0, 800.0], -10.0]
+- time: [2000, 4000]
+  spawn:
+    - freq: 230
+      spawn: enemy1
+      pos: [[0.0, 800.0], -10.0]
+- time: [2000, 4000]
+  spawn:
+    - freq: 600
+      spawn: item
+      pos: [[0.0, 800.0], -10.0]
+- time: 3000
+  spawn:
+    - spawn: boss1
+      pos: [400.0, -100.0]
