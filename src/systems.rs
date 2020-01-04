@@ -17,8 +17,8 @@ impl<'a> System<'a> for MoveObjects {
             pos.y += vel.y;
 
             if let Some(b) = bound {
-                pos.x = pos.x.max(b.x).min(b.x + b.w - pos.w);
-                pos.y = pos.y.max(b.y).min(b.y + b.h - pos.h);
+                pos.x = pos.x.max(b.area.0).min(b.area.0 + b.area.2 - pos.w);
+                pos.y = pos.y.max(b.area.1).min(b.area.1 + b.area.3 - pos.h);
             }
         }
     }

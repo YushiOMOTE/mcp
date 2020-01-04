@@ -1,4 +1,4 @@
-use crate::{entities::*, resources::*};
+use crate::{entities, resources::*};
 use serde::Deserialize;
 use specs::prelude::*;
 
@@ -76,7 +76,7 @@ pub fn spawn(world: &mut World) {
             }
 
             let (x, y) = &s.pos;
-            spawn_one(world, &s.spawn, x.value(), y.value());
+            entities::spawn(world, &s.spawn, x.value(), y.value());
         }
     }
 }

@@ -3,7 +3,7 @@ use serde::Deserialize;
 use specs::prelude::*;
 use specs_derive::Component;
 
-#[derive(new, Default, Component, Debug, Clone)]
+#[derive(new, Default, Component, Deserialize, Debug, Clone)]
 pub struct Pos {
     pub x: f32,
     pub y: f32,
@@ -12,21 +12,18 @@ pub struct Pos {
     pub h: f32,
 }
 
-#[derive(new, Default, Component, Debug, Clone)]
+#[derive(new, Default, Component, Deserialize, Debug, Clone)]
 pub struct Bound {
-    pub x: f32,
-    pub y: f32,
-    pub w: f32,
-    pub h: f32,
+    pub area: (f32, f32, f32, f32),
 }
 
-#[derive(new, Default, Component, Debug, Clone)]
+#[derive(new, Default, Component, Deserialize, Debug, Clone)]
 pub struct Vel {
     pub x: f32,
     pub y: f32,
 }
 
-#[derive(new, Default, Component, Debug, Clone)]
+#[derive(new, Default, Component, Deserialize, Debug, Clone)]
 pub struct Bullet {
     pub damage: u64,
     pub player: bool,
@@ -124,11 +121,15 @@ impl Animation {
 }
 
 #[derive(new, Component, Deserialize, Debug, Clone)]
+#[serde(tag = "type", content = "value")]
 pub enum Lifetime {
+    #[serde(rename = "frameout")]
     Frameout,
+    #[serde(rename = "timer")]
     Timer(u64),
+    #[serde(rename = "scroll")]
     Scroll(f32),
 }
 
 #[derive(new, Component, Deserialize, Debug, Clone)]
-pub struct MustLive;
+pub struct MustLive {}

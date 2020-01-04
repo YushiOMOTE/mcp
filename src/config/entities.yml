@@ -1,3 +1,16 @@
+player:
+  size: [16.0, 24.0]
+  animation: ship
+  components:
+    - name: player
+      life: 150
+      level: 0
+    - name: bound
+      area: [0.0, 0.0, 800.0, 600.0]
+    - name: control
+      vel: 3.0
+    - name: shooter
+    - name: mustlive
 item:
   size: [20.0, 20.0]
   animation: item
@@ -69,3 +82,5 @@ boss1:
       range: 6.28
       num: 24
       animation: bullet
+    - name: bound
+      area: [0.0, 0.0, 800.0, 300.0]

@@ -1,6 +1,5 @@
 use serde::Deserialize;
 use serde_yaml::Value;
-use specs::prelude::*;
 
 pub mod control;
 pub mod linear_move;

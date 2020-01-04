@@ -11,8 +11,6 @@ mod resources;
 mod scenarios;
 mod state;
 mod systems;
-mod user;
-mod utils;
 
 use quicksilver::{
     geom::Vector,

@@ -5,9 +5,7 @@ use crate::{
     components::{self, *},
     entities, extra,
     resources::*,
-    scenarios,
-    systems::*,
-    user,
+    scenarios, systems,
 };
 use quicksilver::{
     graphics::Color,
@@ -18,9 +16,12 @@ use quicksilver::{
 use specs::prelude::*;
 
 components! {
-    ExtraComponents {
+    Components {
         components::Enemy = "enemy",
         components::Item = "item",
+        components::Player = "player",
+        components::Bound = "bound",
+        components::MustLive = "mustlive",
         extra::linear_move::Tag = "linear_move",
         extra::wave_move::Tag = "wave_move",
         extra::radial_attack::Tag = "radial_attack",
@@ -30,7 +31,13 @@ components! {
 }
 
 systems! {
-    ExtraSystems {
+    Systems {
+        systems::MoveObjects,
+        systems::MaintainLifetime,
+        systems::BulletCollisions,
+        systems::EnemyCollisions,
+        systems::ItemCollisions,
+        systems::CheckGameOver,
         extra::linear_move::Action,
         extra::wave_move::Action,
         extra::radial_attack::Action,
@@ -51,7 +58,6 @@ impl State for Play {
         world.insert(Context::new());
         world.insert(Events::new());
         world.insert(animations::AnimationConfig::from_static_file());
-        world.insert(user::UserConfig::from_static_file());
         world.insert(entities::EntitiesConfig::from_static_file());
         world.insert(scenarios::ScenarioConfig::from_static_file());
         world.register::<Vel>();
@@ -65,10 +71,10 @@ impl State for Play {
         world.register::<Item>();
         world.register::<MustLive>();
 
-        ExtraComponents.register(&mut world);
+        Components.register(&mut world);
 
         background::spawn(&mut world);
-        user::spawn(&mut world);
+        scenarios::spawn(&mut world);
 
         let asset_cfg = AssetsConfig::from_static_file();
 
@@ -92,15 +98,9 @@ impl State for Play {
     }
 
     fn update(&mut self, _window: &mut Window) -> Result<()> {
-        MoveObjects.run_now(&mut self.world);
-        MaintainLifetime.run_now(&mut self.world);
-        BulletCollisions.run_now(&mut self.world);
-        EnemyCollisions.run_now(&mut self.world);
-        ItemCollisions.run_now(&mut self.world);
-        ExtraSystems.run_now(&mut self.world);
+        Systems.run_now(&mut self.world);
         self.world.fetch_mut::<Events>().clear();
         self.world.maintain();
-        CheckGameOver.run_now(&mut self.world);
 
         Ok(())
     }
@@ -119,11 +119,11 @@ impl State for Play {
             }
         }
 
-        let mut assets = self.assets.take().unwrap();
-
-        DrawObjects::new(window, &mut assets).run_now(&mut self.world);
-
-        self.assets = Some(assets);
+        {
+            let mut assets = self.assets.take().unwrap();
+            systems::DrawObjects::new(window, &mut assets).run_now(&mut self.world);
+            self.assets = Some(assets);
+        }
 
         Ok(())
     }
