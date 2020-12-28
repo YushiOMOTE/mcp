@@ -1,0 +1,24 @@
+name: build
+
+
+on:
+  push:
+    branches: [master]
+
+
+jobs:
+  build:
+    name: Build game
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup dependencies
+        run: |
+          cargo install cargo-web
+          cargo web deploy --release
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./target/deploy
+
